@@ -1,7 +1,13 @@
-Template.hello.greeting = () ->
-  "Welcome to passwd."
+Meteor.subscribe "passwds"
 
-Template.hello.events {
-  'click input' : () ->
-    console.log "button clicked"
+Template.new.events {
+  'click #new-btn': () ->
+    Meteor.call 'insertPasswd',
+                $('#new-title').val(),
+                $('#new-username').val(),
+                $('#new-password').val()
+    null
 }
+
+Template.passwdlist.entries = () ->
+  Passwds.find {}, {}

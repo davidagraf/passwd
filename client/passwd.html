@@ -3,11 +3,51 @@
 </head>
 
 <body>
-  {{> hello}}
+  <div class="container">
+    <div class="row">
+      <div class="span3">
+        {{loginButtons align="left"}}
+      </div>
+    </div>
+    {{#if currentUser}}
+      {{> usercontent}}
+    {{/if}}
+  </div>
 </body>
 
-<template name="hello">
-  <h1>Hello World!</h1>
-  {{greeting}}
-  <input type="button" value="Click" />
+<template name="usercontent">
+  <div class="row">
+    <div class="span3 offset6">
+      <input type="password" id="passphrase" placeholder="passphrase" />
+    </div>
+  </div>
+  <div class="row">
+    {{> new}}
+  </div>
+  {{> passwdlist}}
+</template>
+
+<template name="new">
+  <div class="span3">
+    <input type="text" id="new-title" placeholder="title" />
+  </div>
+  <div class="span3">
+    <input type="text" id="new-username" placeholder="username" />
+  </div>
+  <div class="span3">
+    <input type="password" id="new-password" placeholder="password" />
+  </div>
+  <div class="span1">
+    <button id="new-btn">Add</button>
+  </div>
+</template>
+
+<template name="passwdlist">
+{{#each entries}}
+  <div class="row">
+    <div class="span3">{{title}}</div>
+    <div class="span3">{{username}}</div>
+    <div class="span3">{{password}}</div>
+  </div>
+{{/each}}
 </template>
