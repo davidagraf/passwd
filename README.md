@@ -1,7 +1,13 @@
 passwd -- meteor password manager
 ================================
 
-## RUN IT
+## HOWTO run it
+
+Note: I propose to install the meteor wrapper meteorite
+(https://github.com/oortcloud/meteorite) instead of meteor. Because meteorite
+allows to install third party smart packages from
+https://atmosphere.meteor.com/ and because I don't like to install software via
+scripts.
 
 ### MAC
 
@@ -39,12 +45,5 @@ passwd -- meteor password manager
 *  open in your browser http://localhost:3000
 
 ### Windows
-* install http://win.meteor.com/
-* install git (however)
-* clone this app
-    * cd <your work directory>
-    *  git clone git@bitbucket.org:davidagraf/passwd.git
-* run it
-    *  cd passwd
-    *  meteor
-*  open in your browser http://localhost:3000
+
+No clue.
