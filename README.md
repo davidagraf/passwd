@@ -9,13 +9,13 @@ passwd -- meteor password manager
 * Install git
     * brew install git
 * Install NPM 
-   * brew install npm
+    * brew install npm
 * Install meteorite
-   * npm install meteorite
+    * npm install meteorite
 * clone this app
-   * cd <your work directory>
-   *  git clone git@bitbucket.org:davidagraf/passwd.git
+    * cd <your work directory>
+    *  git clone git@bitbucket.org:davidagraf/passwd.git
 * run it
-   *  cd passwd
-   *  mrt
+    *  cd passwd
+    *  mrt
 *  open in your browser http://localhost:3000
