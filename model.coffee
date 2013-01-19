@@ -4,7 +4,7 @@ if Meteor.isServer
   Meteor.startup () ->
     # TODO: Wait for meteor to support _ensureIndex officially in its api.
     #       _ensureIndex is a temp solution only.
-    Passwds._ensureIndex {"user" : 1}, {"unique" : true}
+    Passwds._ensureIndex {"user" : 1}, {"unique" : false}
 
 Passwds.allow {
   'remove': (userId, passwds) ->

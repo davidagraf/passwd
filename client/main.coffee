@@ -2,10 +2,12 @@ Meteor.subscribe "passwds"
 
 Template.new.events {
   'click #new-btn': () ->
+    pass = $('#new-password').val()
+    encrypted = CryptoJS.Rabbit.encrypt(pass, Session.get('pass')).toString()
     Meteor.call 'insertPasswd',
                 $('#new-title').val(),
                 $('#new-username').val(),
-                $('#new-password').val()
+                encrypted
     null
 }
 
