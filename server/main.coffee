@@ -7,9 +7,9 @@ Meteor.publish 'passwds', () ->
   Passwds.find {'user': @userId}, {}
 
 Meteor.methods {
-  'insertPasswd': (title, username, password) ->
+  'insertPasswd': (title, username, password) =>
     Passwds.insert {
-      'user': this.userId
+      'user': @userId
       'title': title
       'username': username
       'password':password
