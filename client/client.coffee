@@ -17,17 +17,19 @@ Template.usercontent.events {
     # if not, the passphrase needs to be stored in a custom reactive data
     # source, # see: http://docs.meteor.com/#meteor_deps
     Session.set 'pass', ev.srcElement.value
+    null
 
   'keyup #search': (ev) ->
     Session.set 'search', ev.srcElement.value
+    null
 }
 
 Template.passwdlist.entries = () ->
   search = Session.get 'search'
   if search and search != ''
     # TODO think about optimization. Regex in mongodb can be done on an index.
-    regexp = new RegExp search, "i"
-    Passwds.find {"title":regexp}, {}
+    regexp = new RegExp search, 'i'
+    Passwds.find {'title':regexp}, {}
   else
     Passwds.find {}, {}
 
@@ -41,3 +43,9 @@ Template.passwdlist.decrypt = () ->
       this.password
   catch err
     this.password
+
+Template.passwdlist.events {
+  'click .trash': (ev) ->
+    Passwds.remove {'_id': @_id}
+    false
+}
