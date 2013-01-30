@@ -49,3 +49,9 @@ Template.passwdlist.events {
     Passwds.remove {'_id': @_id}
     false
 }
+
+Meteor.startup () ->
+  $('#passphraseButton').tooltip {
+                                   title: 'set entered passphrase'
+                                   placement: 'bottom'
+                                 }

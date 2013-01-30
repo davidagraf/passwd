@@ -18,10 +18,14 @@
 <template name="usercontent">
   <div class="row">
     <div class="span3">
-      <input type="search" id="search" placeholder="search" autocomplete="off" />
+      <input type="text" id="search" class="search-query" placeholder="search" autocomplete="off" />
     </div>
-    <div class="span3 offset3">
-      <input type="password" id="passphrase" placeholder="passphrase" />
+    <div class="span3 offset3 input-append">
+      <input type="password" id="passphrase" placeholder="passphrase"/>
+      <button id="passphraseButton" class="btn"
+               type="button">
+        <i class="icon-fire"></i>
+      </button>
     </div>
   </div>
   <div class="row">
