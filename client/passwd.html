@@ -21,11 +21,46 @@
       <input type="text" id="search" class="search-query" placeholder="search" autocomplete="off" />
     </div>
     <div class="span3 offset3 input-append">
-      <input type="password" id="passphrase" placeholder="passphrase"/>
-      <button id="passphraseButton" class="btn"
+      <input type="password" id="passphrase"
+             placeholder="passphrase for decryption"/>
+      <button id="button-passphrase" class="btn"
                type="button">
-        <i class="icon-fire"></i>
+        <i class="icon-edit"></i>
       </button>
+    </div>
+
+    <div id="modal-passphrase" class="modal hide fade">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3>Set Encryption Passphrase</h3>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="span3">
+            <input type="password" class="passphrase-new" id="passphrase-new1"
+                   placeholder="new passphrase"/>
+          </div>
+        </div>
+        <div class="row">
+          <div class="control-group" id="passphrase-group">
+            <div class="controls">
+              <div class="span3">
+                <input type="password" class="passphrase-new" id="passphrase-new2"
+                       placeholder="repeat passphrase"/>
+              </div>
+              {{#unless newPpEqual}}
+              <div class="span2" id="passphrase-error-msg">
+                <span class="help-inline">doesn't match</span>
+              </div>
+              {{/unless}}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="button-passphrase-change" class="btn btn-primary"
+                data-dismiss="modal">Change</button>
+      </div>
     </div>
   </div>
   <div class="row">
