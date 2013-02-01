@@ -22,7 +22,7 @@
     </div>
     <div class="span3 offset3 input-append">
       <input type="password" id="passphrase"
-             placeholder="passphrase for decryption"/>
+             placeholder="passphrase"/>
       <button id="button-passphrase" class="btn"
                type="button">
         <i class="icon-edit"></i>
@@ -37,23 +37,8 @@
       <div class="modal-body">
         <div class="row">
           <div class="span3">
-            <input type="password" class="passphrase-new" id="passphrase-new1"
-                   placeholder="new passphrase"/>
-          </div>
-        </div>
-        <div class="row">
-          <div class="control-group" id="passphrase-group">
-            <div class="controls">
-              <div class="span3">
-                <input type="password" class="passphrase-new" id="passphrase-new2"
-                       placeholder="repeat passphrase"/>
-              </div>
-              {{#unless newPpEqual}}
-              <div class="span2" id="passphrase-error-msg">
-                <span class="help-inline">doesn't match</span>
-              </div>
-              {{/unless}}
-            </div>
+            <input type="password" class="passphrase-old" id="passphrase-old"
+                   placeholder="old passphrase"/>
           </div>
         </div>
       </div>

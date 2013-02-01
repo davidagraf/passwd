@@ -51,10 +51,10 @@ Template.passwdlist.events {
 }
 
 Meteor.startup () ->
-  $('#passphraseButton').tooltip {
-                                   title: 'set passphrase for encryption'
-                                   placement: 'bottom'
-                                 }
+  $('#button-passphrase').tooltip {
+                                    title: 'replace old pwd with current'
+                                    placement: 'bottom'
+                                  }
 
 Template.usercontent.events {
   'click #button-passphrase': (ev) ->
@@ -66,18 +66,4 @@ Template.usercontent.events {
 
   'click #button-passphrase-change': (ev) ->
     val = $('#passphrase-new').val()
-}
-
-Template.usercontent.events {
-  'keyup .passphrase-new': (ev) ->
-    equal = $('#passphrase-new1').val() == $('#passphrase-new2').val()
-    if equal != Session.get 'new-passphrase-equal'
-      if equal
-        $('#passphrase-error-msg').hide()
-        $('#passphrase-group').removeClass 'error'
-      else
-        $('#passphrase-error-msg').show()
-        $('#passphrase-group').addClass 'error'
-      Session.set 'new-passphrase-equal', equal
-    null
 }
