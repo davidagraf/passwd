@@ -5,6 +5,7 @@ Template.new.events {
     pass = $('#new-password').val()
     encrypted = CryptoJS.Rabbit.encrypt(pass, Session.get('pass')).toString()
     Meteor.call 'insertPasswd',
+                @userId,
                 $('#new-title').val(),
                 $('#new-username').val(),
                 encrypted
@@ -65,5 +66,14 @@ Template.usercontent.events {
     null
 
   'click #button-passphrase-change': (ev) ->
-    val = $('#passphrase-new').val()
+    newPp = $('#passphrase-new').val()
+    Session.set 'pass', newPp
+    $('#passphrase').val newPp
+
+    hash = CryptoJS.SHA3(newPp).toString()
+    Meteor.call 'insertPpHash',
+                @userId,
+                hash
+
+    null
 }
