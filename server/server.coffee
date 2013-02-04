@@ -7,7 +7,7 @@ Meteor.publish 'passwds', () ->
   Passwds.find {'user': @userId}, {}
 
 Meteor.publish 'pphashes', ()->
-  Passwds.find {'user': @userId}, {}
+  PpHashes.find {'user': @userId}, {}
 
 Meteor.methods {
   'insertPasswd': (userId, title, username, password) =>
@@ -21,9 +21,8 @@ Meteor.methods {
 
 Meteor.methods {
   'insertPpHash': (userId, pphash) =>
-    console.log userId
     PpHashes.update {
-      'user': @userId
+      'user': userId
     },
     {
       '$set': { 'pphash': pphash }

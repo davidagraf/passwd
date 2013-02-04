@@ -1,4 +1,5 @@
 Meteor.subscribe "passwds"
+Meteor.subscribe "pphashes"
 
 Template.new.events {
   'click #new-btn': () ->
@@ -14,10 +15,20 @@ Template.new.events {
 
 Template.usercontent.events {
   'keyup #passphrase': (ev) ->
-    # TODO: is this secure?
-    # if not, the passphrase needs to be stored in a custom reactive data
-    # source, # see: http://docs.meteor.com/#meteor_deps
-    Session.set 'pass', ev.srcElement.value
+    passphrase = ev.srcElement.value
+    storedHash = PpHashes.findOne {}, {}
+
+    # check if entered passphrase is valid
+    currentHash = CryptoJS.SHA3(passphrase).toString()
+
+    if storedHash and (storedHash.pphash == currentHash)
+      # TODO: is this secure?
+      # if not, the passphrase needs to be stored in a custom reactive data
+      # source, # see: http://docs.meteor.com/#meteor_deps
+      Session.set 'pass', ev.srcElement.value
+    else
+      Session.set 'pass'
+
     null
 
   'keyup #search': (ev) ->
@@ -41,9 +52,9 @@ Template.passwdlist.decrypt = () ->
       obj = CryptoJS.Rabbit.decrypt(this.password, Session.get('pass'))
       obj.toString(CryptoJS.enc.Utf8)
     else
-      this.password
+      ''
   catch err
-    this.password
+    ''
 
 Template.passwdlist.events {
   'click .trash': (ev) ->
@@ -60,7 +71,6 @@ Meteor.startup () ->
 Template.usercontent.events {
   'click #button-passphrase': (ev) ->
     $('#modal-passphrase').modal {keyboard: true}
-    Session.set 'new-passphrase-equal', false
     $('#passphrase-error-msg').hide
     $('#passphrase-group').addClass 'error'
     null
