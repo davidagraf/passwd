@@ -2,14 +2,22 @@ Meteor.subscribe "passwds"
 Meteor.subscribe "pphashes"
 
 Template.new.events {
-  'click #new-btn': () ->
-    pass = $('#new-password').val()
+  'click #button-new': () ->
+    htmlTitle = $('#new-title')
+    htmlUsername = $('#new-username')
+    htmlPass = $('#new-password')
+    pass = htmlPass.val()
     encrypted = CryptoJS.Rabbit.encrypt(pass, Session.get('pass')).toString()
     Meteor.call 'insertPasswd',
                 @userId,
-                $('#new-title').val(),
-                $('#new-username').val(),
+                htmlTitle.val(),
+                htmlUsername.val(),
                 encrypted
+
+    htmlTitle.val ''
+    htmlUsername.val ''
+    htmlPass.val ''
+
     null
 }
 
@@ -104,4 +112,6 @@ Template.usercontent.events {
 }
 
 Template.usercontent.wrongPassphrase = () ->
+  not Session.get 'pass'
+Template.new.wrongPassphrase = () ->
   not Session.get 'pass'
