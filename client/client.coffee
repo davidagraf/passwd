@@ -76,14 +76,29 @@ Template.usercontent.events {
     null
 
   'click #button-passphrase-change': (ev) ->
+
     newPp = $('#passphrase-new').val()
+    oldPp = Session.get 'pass'
     Session.set 'pass', newPp
     $('#passphrase').val newPp
+
+    # TODO This operation is unsafe. If something crashes, the database
+    # entries are fucked up. On solution would be versioning: Always keep the
+    # old encrypted passwords and store the current version in the pphash 
+    # collection
+    if oldPp
+      entries = Passwds.find {}, {}
+      entries.forEach (entry) ->
+        oldEncrypted = entry.password
+        passObj = CryptoJS.Rabbit.decrypt(oldEncrypted, oldPp)
+        newEncrypted = CryptoJS.Rabbit.encrypt(passObj, Session.get('pass')).toString()
+        Passwds.update {'_id' : entry._id}, {'$set' : {'password':newEncrypted}}
 
     hash = CryptoJS.SHA3(newPp).toString()
     Meteor.call 'insertPpHash',
                 @userId,
                 hash
+
 
     null
 }

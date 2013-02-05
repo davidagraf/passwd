@@ -12,4 +12,7 @@ Passwds.allow {
   'remove': (userId, passwds) ->
     not _.any passwds, (passwd) ->
       passwd.user != userId
+  'update': (userId, passwds, fields, modifier) ->
+    _.all passwds, (passwd) ->
+      passwd.user == userId
 }
