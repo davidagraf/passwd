@@ -87,3 +87,6 @@ Template.usercontent.events {
 
     null
 }
+
+Template.usercontent.wrongPassphrase = () ->
+  not Session.get 'pass'

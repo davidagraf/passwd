@@ -20,12 +20,18 @@
     <div class="span3">
       <input type="text" id="search" class="search-query" placeholder="search" autocomplete="off" />
     </div>
-    <div class="span3 offset3 input-append">
-      <input type="password" id="passphrase"
-             placeholder="passphrase"/>
-      <button id="button-passphrase" class="btn"
-               type="button">
-        <i class="icon-edit"></i>
+    {{#if wrongPassphrase}}
+    <div class="span3 offset3 input-append control-group error">
+    {{else}}
+    <div class="span3 offset3 input-append control-group">
+    {{/if}}
+      <div class="controls">
+        <input type="password" id="passphrase"
+               placeholder="passphrase"/>
+        <button id="button-passphrase" class="btn"
+                 type="button">
+          <i class="icon-edit"></i>
+      </div>
       </button>
     </div>
 
