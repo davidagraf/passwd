@@ -1,3 +1,6 @@
+require = __meteor_bootstrap__.require
+Future = require 'fibers/future'
+
 Meteor.startup () ->
   # code to run on server at startup
   # console.log "server startup"
@@ -31,3 +34,15 @@ Meteor.methods {
       'upsert': true
     }
 }
+
+Meteor.startup () ->
+  Meteor.Router.add
+    '/:user/passwds.csv': (user) ->
+      @response.writeHead 200, {
+        'Content-Type':'text/csv'
+      }
+      entries = Passwds.find {'user': user}, {}
+      @response.write "Ttitle,Username,Encoded Password\n"
+      entries.forEach (entry) =>
+        @response.write "#{entry.title},#{entry.username},#{entry.password}\n"
+      @response.end()
