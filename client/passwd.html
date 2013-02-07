@@ -60,7 +60,23 @@
   <div class="row">
     {{> new}}
   </div>
-  {{> passwdlist}}
+  <div class="row">
+    <div class="span12">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Username</th>
+            <th>Password</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+        {{> passwdlist}}
+        </tbody>
+      </table>
+    </div>
+  </div>
 </template>
 
 <template name="new">
@@ -84,11 +100,11 @@
 
 <template name="passwdlist">
 {{#each entries}}
-  <div class="row">
-    <div class="span3">{{title}}</div>
-    <div class="span3">{{username}}</div>
-    <div class="span3">{{decrypt}}</div>
-    <div class="span1"><a class="trash" href="#"><i class="icon-trash"> </i></a></div>
-  </div>
+  <tr>
+    <td>{{title}}</td>
+    <td>{{username}}</td>
+    <td>{{decrypt}}</td>
+    <td><a class="trash" href="#"><i class="icon-trash"> </i></a></td>
+  </tr>
 {{/each}}
 </template>
