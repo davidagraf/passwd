@@ -115,3 +115,52 @@ Template.usercontent.userId = @userId
 
 Template.new.wrongPassphrase = () ->
   not Session.get 'pass'
+
+activateInput = (input) ->
+  input.focus()
+  input.select()
+
+# Code for inplace editing
+
+# Returns an event map that handles the "escape" and "return" keys and
+# "blur" events on a text input (given by selector) and interprets them as
+# "ok" or "cancel"
+
+okCancelEvents = (selector, callbacks) ->
+  ok = callbacks.ok or () -> null
+  cancel = callbacks.cancel or () -> null
+
+  events = {}
+  events["keyup #{selector}, keydown #{selector}, focusout #{selector}"] =
+    (ev) ->
+      if ev.type == 'keydown' and ev.which == 27
+        canncel.call this, ev
+      else if ev.type == 'keyup' and ev.which == 13 or
+              ev.type == 'focusout'
+        value = ev.target.value
+        if value
+          ok.call this, value, ev
+        else
+          cancel.call this, ev
+      null
+  events
+
+Template.passwdlist.events {
+  'dblclick .row' : (ev, tmpl) ->
+    Session.set 'editing_row', @_id
+    Meteor.flush()
+    activateInput(tmpl.find('#table-input'))
+}
+
+Template.passwdlist.editing = () ->
+  Session.equals 'editing_row', @_id
+
+Template.passwdlist.events(okCancelEvents(
+  '#table-input',
+  {
+    ok: (value) ->
+      Session.set 'editing_row', null
+    cancel: () ->
+      Session.setx 'editing_row', null
+  }
+))
