@@ -97,20 +97,24 @@
 <template name="passwdlist">
 {{#each entries}}
   <tr>
-    <td class="row">
-    {{#if editing}}
-      <div class="edit">
-        <input class="table-input" id="table-input" type="text" value="{{title}}" />
-      </div>
-    {{else}}
-      <div class="display">
-        {{title}}
-      </div>
-    {{/if}}
-    </td>
-    <td>{{username}}</td>
-    <td>{{decrypt}}</td>
+    {{> passwdcell passwdcelltitle }}
+    {{> passwdcell passwdcellusername }}
+    {{> passwdcell passwdcelldecrypt }}
     <td><a class="trash" href="#"><i class="icon-trash"> </i></a></td>
   </tr>
 {{/each}}
+</template>
+
+<template name="passwdcell">
+    <td class="cell">
+    {{#if editing}}
+      <div class="edit">
+        <input class="cell-input" id="cell-input" type="text" value="{{value}}" />
+      </div>
+    {{else}}
+      <div class="display">
+        {{value}}
+      </div>
+    {{/if}}
+    </td>
 </template>

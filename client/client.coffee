@@ -78,25 +78,42 @@ Template.usercontent.events {
     null
 }
 
-Template.passwdlist.entries = () ->
-  search = Session.get 'search'
-  if search and search != ''
-    # TODO think about optimization. Regex in mongodb can be done on an index.
-    regexp = new RegExp search, 'i'
-    Passwds.find {'title':regexp}, {}
-  else
-    Passwds.find {}, {}
+add_id = (o) ->
+  _.extend o, {_id: Meteor.uuid()}
 
-Template.passwdlist.decrypt = () ->
-  pass = Session.get 'pass'
-  try
-    if pass and pass != ''
-      obj = CryptoJS.Rabbit.decrypt(this.password, Session.get('pass'))
-      obj.toString(CryptoJS.enc.Utf8)
+Template.passwdlist.helpers {
+  entries: () ->
+    search = Session.get 'search'
+    if search and search != ''
+      # TODO think about optimization. Regex in mongodb can be done on an index.
+      regexp = new RegExp search, 'i'
+      Passwds.find {'title':regexp}, {}
     else
-      ''
-  catch err
-    ''
+      Passwds.find {}, {}
+
+  passwdcelldecrypt: () ->
+    pass = Session.get 'pass'
+    text =
+      try
+        if pass and pass != ''
+          obj = CryptoJS.Rabbit.decrypt(this.password, Session.get('pass'))
+          obj.toString(CryptoJS.enc.Utf8)
+        else
+          ''
+      catch err
+        ''
+    add_id { 'value' : text }
+
+
+  passwdcelltitle: () ->
+    add_id { 'value' : @title }
+
+  passwdcellusername: () ->
+    {
+      '_id' : Meteor.uuid()
+      'value' : @username
+    }
+}
 
 Template.passwdlist.events {
   'click .trash': (ev) ->
@@ -150,22 +167,22 @@ okCancelEvents = (selector, callbacks) ->
       null
   events
 
-Template.passwdlist.events {
-  'dblclick .row' : (ev, tmpl) ->
-    Session.set 'editing_row', @_id
+Template.passwdcell.events {
+  'dblclick .cell' : (ev, tmpl) ->
+    Session.set 'editing_cell', @_id
     Meteor.flush()
-    activateInput(tmpl.find('#table-input'))
+    activateInput(tmpl.find('#cell-input'))
 }
 
-Template.passwdlist.editing = () ->
-  Session.equals 'editing_row', @_id
+Template.passwdcell.editing = () ->
+  Session.equals 'editing_cell', @_id
 
 Template.passwdlist.events(okCancelEvents(
-  '#table-input',
+  '#cell-input',
   {
     ok: (value) ->
-      Session.set 'editing_row', null
+      Session.set 'editing_cell', null
     cancel: () ->
-      Session.setx 'editing_row', null
+      Session.setx 'editing_cell', null
   }
 ))
