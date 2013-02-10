@@ -23,11 +23,7 @@
     <div class="span3">
       <a class="btn btn-primary" href="/{{userId}}/passwds.csv">CSV</a>
     </div>
-    {{#if wrongPassphrase}}
-    <div class="span3 input-append control-group error">
-    {{else}}
-    <div class="span3 input-append control-group">
-    {{/if}}
+    <div class="span3 input-append control-group {{wrongPassphraseClass}}">
       <div class="controls">
         <input type="password" id="passphrase"
                placeholder="passphrase"/>

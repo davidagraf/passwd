@@ -43,10 +43,12 @@ Template.usercontent.events {
     Session.set 'search', ev.srcElement.value
     null
 
-  'click #button-passphrase': (ev) ->
-    $('#modal-passphrase').modal {keyboard: true}
-    $('#passphrase-error-msg').hide
-    $('#passphrase-group').addClass 'error'
+  'click #button-passphrase': (ev, tmpl) ->
+    $(tmpl.find('#modal-passphrase')).modal {keyboard: true}
+    $(tmpl.find('#passphrase-error-msg')).hide
+    $(tmpl.find('#passphrase-group')).addClass 'error'
+    Meteor.flush()
+    tmpl.find('#passphrase-new').focus()
     null
 
   'click #button-passphrase-change': (ev) ->
@@ -108,8 +110,11 @@ Meteor.startup () ->
                                     placement: 'bottom'
                                   }
 
-Template.usercontent.wrongPassphrase = () ->
-  not Session.get 'pass'
+Template.usercontent.wrongPassphraseClass = () ->
+  if not Session.get 'pass'
+    'error'
+  else
+    ''
 
 Template.usercontent.userId = @userId
 
