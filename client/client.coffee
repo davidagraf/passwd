@@ -104,12 +104,15 @@ Template.passwdlist.helpers {
               obj = CryptoJS.Rabbit.decrypt(@password, Session.get('pass'))
               obj.toString(CryptoJS.enc.Utf8)
             else
-              ''
+              null
           catch err
-            ''
+            null
       ,
-      () =>
-        null
+      (newval) =>
+        pass = Session.get 'pass'
+        if pass and pass != ''
+          encrypted = CryptoJS.Rabbit.encrypt(newval, pass).toString()
+          Passwds.update {'_id': @_id}, {'$set': {'password': encrypted}}
 
 
   passwdcelltitle: () ->
@@ -149,7 +152,7 @@ Template.usercontent.wrongPassphraseClass = () ->
 
 Template.usercontent.userId = @userId
 
-Template.new.wrongPassphrase = () ->
+Template.new.newDisabled = () ->
   not Session.get 'pass'
 
 activateInput = (input) ->
@@ -183,9 +186,10 @@ okCancelEvents = (selector, callbacks) ->
 
 Template.passwdcell.events {
   'dblclick .cell' : (ev, tmpl) ->
-    Session.set 'editing_cell', @_id
-    Meteor.flush()
-    activateInput(tmpl.find('#cell-input'))
+    if @value
+      Session.set 'editing_cell', @_id
+      Meteor.flush()
+      activateInput(tmpl.find('#cell-input'))
 }
 
 Template.passwdcell.editing = () ->

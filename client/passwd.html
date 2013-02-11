@@ -86,8 +86,8 @@
     <input type="password" id="new-password" placeholder="password" />
   </div>
   <div class="span1">
-    {{#if wrongPassphrase}}
-    <button class="btn" id="button-new" disabled="true">Add</button>
+    {{#if newDisabled}}
+    <button class="btn btn-primary" id="button-new" disabled="true">Add</button>
     {{else}}
     <button class="btn btn-primary" id="button-new">Add</button>
     {{/if}}
@@ -113,7 +113,9 @@
       </div>
     {{else}}
       <div class="display">
-        {{value}}
+        {{#if value}}
+          {{value}}
+        {{/if}}
       </div>
     {{/if}}
     </td>
