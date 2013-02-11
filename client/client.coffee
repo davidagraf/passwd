@@ -78,8 +78,12 @@ Template.usercontent.events {
     null
 }
 
-add_id = (o) ->
-  _.extend o, {_id: Meteor.uuid()}
+cellMetaData = (valuefunc, updatefunc) ->
+  {
+    value: valuefunc()
+    _id: Meteor.uuid()
+    updatefunc: updatefunc
+  }
 
 Template.passwdlist.helpers {
   entries: () ->
@@ -92,27 +96,37 @@ Template.passwdlist.helpers {
       Passwds.find {}, {}
 
   passwdcelldecrypt: () ->
-    pass = Session.get 'pass'
-    text =
-      try
-        if pass and pass != ''
-          obj = CryptoJS.Rabbit.decrypt(this.password, Session.get('pass'))
-          obj.toString(CryptoJS.enc.Utf8)
-        else
-          ''
-      catch err
-        ''
-    add_id { 'value' : text }
+    cellMetaData () =>
+        pass = Session.get 'pass'
+        text =
+          try
+            if pass and pass != ''
+              obj = CryptoJS.Rabbit.decrypt(@password, Session.get('pass'))
+              obj.toString(CryptoJS.enc.Utf8)
+            else
+              ''
+          catch err
+            ''
+      ,
+      () =>
+        null
 
 
   passwdcelltitle: () ->
-    add_id { 'value' : @title }
+    cellMetaData () =>
+        @title
+      ,
+      (newval) =>
+        Passwds.update {'_id': @_id}, {'$set': {'title': newval}}
+        null
 
   passwdcellusername: () ->
-    {
-      '_id' : Meteor.uuid()
-      'value' : @username
-    }
+    cellMetaData () =>
+        @username
+      ,
+      (newval) =>
+        Passwds.update {'_id': @_id}, {'$set': {'username': newval}}
+        null
 }
 
 Template.passwdlist.events {
@@ -156,7 +170,7 @@ okCancelEvents = (selector, callbacks) ->
   events["keyup #{selector}, keydown #{selector}, focusout #{selector}"] =
     (ev) ->
       if ev.type == 'keydown' and ev.which == 27
-        canncel.call this, ev
+        cancel.call this, ev
       else if ev.type == 'keyup' and ev.which == 13 or
               ev.type == 'focusout'
         value = ev.target.value
@@ -180,9 +194,11 @@ Template.passwdcell.editing = () ->
 Template.passwdlist.events(okCancelEvents(
   '#cell-input',
   {
-    ok: (value) ->
+    ok: (value, ev) ->
+      if value != @value and value != ''
+        @updatefunc(value)
       Session.set 'editing_cell', null
-    cancel: () ->
-      Session.setx 'editing_cell', null
+    cancel: (ev) ->
+      Session.set 'editing_cell', null
   }
 ))
