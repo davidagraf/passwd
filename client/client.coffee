@@ -86,9 +86,17 @@ Template.usercontent.events {
     null
 }
 
-cellMetaData = (valuefunc, updatefunc) ->
+cellMetaData = (valuefunc, updatefunc, ispass) ->
+  value = valuefunc()
+  txtvalue =
+    if value and ispass
+      Array(value.length + 1).join '*'
+    else
+      value
   {
-    value: valuefunc()
+    txtvalue: txtvalue
+    value: value
+    ispass: if ispass then ispass else false
     _id: Meteor.uuid()
     updatefunc: updatefunc
   }
@@ -121,6 +129,8 @@ Template.passwdlist.helpers {
         if pass and pass != ''
           encrypted = CryptoJS.Rabbit.encrypt(newval, pass).toString()
           Passwds.update {'_id': @_id}, {'$set': {'password': encrypted}}
+      ,
+      true
 
 
   passwdcelltitle: () ->
