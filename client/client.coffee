@@ -2,22 +2,30 @@ Meteor.subscribe "passwds"
 Meteor.subscribe "pphashes"
 
 Template.new.events {
-  'click #button-new': () ->
-    htmlTitle = $('#new-title')
-    htmlUsername = $('#new-username')
-    htmlPass = $('#new-password')
-    pass = htmlPass.val()
+  'click #button-new': (ev, tmpl) ->
+    htmlTitle = tmpl.find('#new-title')
+    htmlUsername = tmpl.find('#new-username')
+    htmlPass = tmpl.find('#new-password')
+    pass = htmlPass.value
     encrypted = CryptoJS.Rabbit.encrypt(pass, Session.get('pass')).toString()
     Meteor.call 'insertPasswd',
                 @userId,
-                htmlTitle.val(),
-                htmlUsername.val(),
+                htmlTitle.value,
+                htmlUsername.value,
                 encrypted
 
-    htmlTitle.val ''
-    htmlUsername.val ''
-    htmlPass.val ''
+    htmlTitle.value = ''
+    htmlUsername.value = ''
+    htmlPass.value = ''
 
+    null
+  'keyup input' : (ev, tmpl) ->
+    id = ev.srcElement.getAttribute('id')
+    value = ev.srcElement.value
+    if value == ''
+      Session.set id
+    else
+      Session.set id, value
     null
 }
 
@@ -152,8 +160,14 @@ Template.usercontent.wrongPassphraseClass = () ->
 
 Template.usercontent.userId = @userId
 
-Template.new.newDisabled = () ->
-  not Session.get 'pass'
+Template.new.newEnabled = () ->
+  Session.get('pass')? and _.all(
+    Session.get(x)? for x in ['new-title', 'new-username', 'new-password'])
+      
+
+#Template.new.newEnabled = () ->
+#  Session.get 'pass' and Session.get 'new-title' and Session.get 'new-username' and Session.get 'new-password'
+#  Session.get 'pass'
 
 activateInput = (input) ->
   input.focus()
