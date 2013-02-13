@@ -1,35 +1,41 @@
 Meteor.subscribe "passwds"
 Meteor.subscribe "pphashes"
 
-Template.new.events {
-  'click #button-new': (ev, tmpl) ->
-    htmlTitle = tmpl.find('#new-title')
-    htmlUsername = tmpl.find('#new-username')
-    htmlPass = tmpl.find('#new-password')
-    pass = htmlPass.value
-    encrypted = CryptoJS.Rabbit.encrypt(pass, Session.get('pass')).toString()
-    Meteor.call 'insertPasswd',
-                @userId,
-                htmlTitle.value,
-                htmlUsername.value,
-                encrypted
+activateInput = (input) ->
+  input.focus()
+  input.select()
 
-    htmlTitle.value = ''
-    htmlUsername.value = ''
-    htmlPass.value = ''
+# Returns an event map that handles the "escape" and "return" keys and
+# "blur" events on a text input (given by selector) and interprets them as
+# "ok" or "cancel"
+okCancelEvents = (selector, callbacks) ->
+  ok = callbacks.ok or () -> null
+  cancel = callbacks.cancel or () -> null
 
-    null
-  'keyup input' : (ev, tmpl) ->
-    id = ev.srcElement.getAttribute('id')
-    value = ev.srcElement.value
-    if value == ''
-      Session.set id
-    else
-      Session.set id, value
-    null
-}
+  events = {}
+  events["keyup #{selector}, keydown #{selector}, focusout #{selector}"] =
+    (ev) ->
+      if ev.type == 'keydown' and ev.which == 27
+        cancel.call this, ev
+      else if ev.type == 'keyup' and ev.which == 13 or
+              ev.type == 'focusout'
+        value = ev.target.value
+        if value
+          ok.call this, value, ev
+        else
+          cancel.call this, ev
+      null
+  events
+
 
 Template.usercontent.events {
+  'keyup #search': (ev) ->
+    Session.set 'search', ev.srcElement.value
+    null
+
+}
+
+Template.passphrase.events {
   'keyup #passphrase': (ev) ->
     passphrase = ev.srcElement.value
     storedHash = PpHashes.findOne {}, {}
@@ -47,44 +53,73 @@ Template.usercontent.events {
 
     null
 
-  'keyup #search': (ev) ->
-    Session.set 'search', ev.srcElement.value
+  'click #button-passphrase-set': (ev, tmpl) ->
+    Session.set 'set-passphrase', true
+    activateInput(tmpl.find('#passphrase'))
     null
 
-  'click #button-passphrase': (ev, tmpl) ->
-    $(tmpl.find('#modal-passphrase')).modal {keyboard: true}
-    $(tmpl.find('#passphrase-error-msg')).hide
-    $(tmpl.find('#passphrase-group')).addClass 'error'
-    Meteor.flush()
-    tmpl.find('#passphrase-new').focus()
+  'click #button-passphrase-change': (ev, tmpl) ->
+    Session.set 'passphrase-changing', true
+    activateInput(tmpl.find('#passphrase'))
     null
 
-  'click #button-passphrase-change': (ev) ->
-    newPp = $('#passphrase-new').val()
-    oldPp = Session.get 'pass'
-    Session.set 'pass', newPp
-    $('#passphrase').val newPp
-
-    # TODO This operation is unsafe. If something crashes, the database
-    # entries are fucked up. On solution would be versioning: Always keep the
-    # old encrypted passwords and store the current version in the pphash 
-    # collection
-    if oldPp
-      entries = Passwds.find {}, {}
-      entries.forEach (entry) ->
-        oldEncrypted = entry.password
-        passObj = CryptoJS.Rabbit.decrypt(oldEncrypted, oldPp)
-        newEncrypted = CryptoJS.Rabbit.encrypt(passObj, Session.get('pass')).toString()
-        Passwds.update {'_id' : entry._id}, {'$set' : {'password':newEncrypted}}
-
-    hash = CryptoJS.SHA3(newPp).toString()
-    Meteor.call 'insertPpHash',
-                @userId,
-                hash
-
-
-    null
+#    newPp = $('#passphrase-new').val()
+#    oldPp = Session.get 'pass'
+#    Session.set 'pass', newPp
+#    $('#passphrase').val newPp
+#
+#    # TODO This operation is unsafe. If something crashes, the database
+#    # entries are fucked up. On solution would be versioning: Always keep the
+#    # old encrypted passwords and store the current version in the pphash 
+#    # collection
+#    if oldPp
+#      entries = Passwds.find {}, {}
+#      entries.forEach (entry) ->
+#        oldEncrypted = entry.password
+#        passObj = CryptoJS.Rabbit.decrypt(oldEncrypted, oldPp)
+#        newEncrypted = CryptoJS.Rabbit.encrypt(passObj, Session.get('pass')).toString()
+#        Passwds.update {'_id' : entry._id}, {'$set' : {'password':newEncrypted}}
+#
+#    hash = CryptoJS.SHA3(newPp).toString()
+#    Meteor.call 'insertPpHash',
+#                @userId,
+#                hash
+#
+#
+#    null
 }
+
+Template.passphrase.helpers {
+  validPassphrase: () ->
+    Session.get('pass')?
+  passphraseForm: () ->
+    Session.get('set-passphrase')?or Session.get('passphrase-changing')?
+  setPassphraseBtn: () ->
+    not Session.get('pass') and not Session.get 'set-passphrase'
+  passphraseError: () ->
+    if not Session.get 'pass'
+      'error'
+    else
+      ''
+  userId: @userId
+}
+
+Template.passphrase.events(okCancelEvents(
+  '#passphrase',
+  {
+    ok: (value, ev) ->
+      Session.set 'set-passphrase', null
+      if not Session.get 'pass'
+        ev.srcElement.value = ''
+        null
+      null
+    cancel: (ev) ->
+      Session.set 'set-passphrase', null
+      null
+  }
+))
+
+
 
 cellMetaData = (valuefunc, updatefunc, ispass) ->
   value = valuefunc()
@@ -157,56 +192,44 @@ Template.passwdlist.events {
 }
 
 Meteor.startup () ->
-  $('#button-passphrase').tooltip {
-                                    title: 'replace old pwd with current'
-                                    placement: 'bottom'
-                                  }
+#  $('#button-passphrase').tooltip {
+#                                    title: 'replace old pwd with current'
+#                                    placement: 'bottom'
+#                                  }
+  null
 
-Template.usercontent.wrongPassphraseClass = () ->
-  if not Session.get 'pass'
-    'error'
-  else
-    ''
+Template.new.events {
+  'click #button-new': (ev, tmpl) ->
+    htmlTitle = tmpl.find('#new-title')
+    htmlUsername = tmpl.find('#new-username')
+    htmlPass = tmpl.find('#new-password')
+    pass = htmlPass.value
+    encrypted = CryptoJS.Rabbit.encrypt(pass, Session.get('pass')).toString()
+    Meteor.call 'insertPasswd',
+                @userId,
+                htmlTitle.value,
+                htmlUsername.value,
+                encrypted
 
-Template.usercontent.userId = @userId
+    htmlTitle.value = ''
+    htmlUsername.value = ''
+    htmlPass.value = ''
+
+    null
+  'keyup input' : (ev, tmpl) ->
+    id = ev.srcElement.getAttribute('id')
+    value = ev.srcElement.value
+    if value == ''
+      Session.set id
+    else
+      Session.set id, value
+    null
+}
 
 Template.new.newEnabled = () ->
   Session.get('pass')? and _.all(
     Session.get(x)? for x in ['new-title', 'new-username', 'new-password'])
       
-
-#Template.new.newEnabled = () ->
-#  Session.get 'pass' and Session.get 'new-title' and Session.get 'new-username' and Session.get 'new-password'
-#  Session.get 'pass'
-
-activateInput = (input) ->
-  input.focus()
-  input.select()
-
-# Code for inplace editing
-
-# Returns an event map that handles the "escape" and "return" keys and
-# "blur" events on a text input (given by selector) and interprets them as
-# "ok" or "cancel"
-
-okCancelEvents = (selector, callbacks) ->
-  ok = callbacks.ok or () -> null
-  cancel = callbacks.cancel or () -> null
-
-  events = {}
-  events["keyup #{selector}, keydown #{selector}, focusout #{selector}"] =
-    (ev) ->
-      if ev.type == 'keydown' and ev.which == 27
-        cancel.call this, ev
-      else if ev.type == 'keyup' and ev.which == 13 or
-              ev.type == 'focusout'
-        value = ev.target.value
-        if value
-          ok.call this, value, ev
-        else
-          cancel.call this, ev
-      null
-  events
 
 Template.passwdcell.events {
   'dblclick .cell' : (ev, tmpl) ->

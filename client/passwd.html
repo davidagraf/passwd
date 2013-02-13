@@ -23,35 +23,7 @@
     <div class="span3">
       <a class="btn btn-primary" href="/{{userId}}/passwds.csv">CSV</a>
     </div>
-    <div class="span3 input-append control-group {{wrongPassphraseClass}}">
-      <div class="controls">
-        <input type="password" id="passphrase"
-               placeholder="passphrase"/>
-        <button id="button-passphrase" class="btn"
-                 type="button">
-          <i class="icon-edit"></i>
-      </div>
-      </button>
-    </div>
-
-    <div id="modal-passphrase" class="modal hide fade">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h3>Set Encryption Passphrase</h3>
-      </div>
-      <div class="modal-body">
-        <div class="row">
-          <div class="span3">
-            <input type="password" id="passphrase-new"
-                   placeholder="new passphrase"/>
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button id="button-passphrase-change" class="btn btn-primary"
-                data-dismiss="modal">Change</button>
-      </div>
-    </div>
+    {{> passphrase}}
   </div>
   <div class="row">
     {{> new}}
@@ -72,6 +44,32 @@
         </tbody>
       </table>
     </div>
+  </div>
+</template>
+
+<template name="passphrase">
+  <div class="span3 input-append">
+    <div class="control-group {{passphraseError}}"><div class="controls">
+      {{#if passphraseForm}}
+        <input type="password" id="passphrase"/>
+      {{else}}
+        <input type="password" id="passphrase" disabled="true"/>
+      {{/if}}
+      {{#if setPassphraseBtn}}
+        <button id="button-passphrase-set" class="btn btn-danger" type="button">
+      {{else}}
+        <button id="button-passphrase-set" class="btn btn-danger" disabled="true" type="button">
+      {{/if}}
+        <i class="icon-fire"></i>
+      </button>
+      {{#if validPassphrase}}
+      <button id="button-passphrase-change" class="btn btn-primary" type="button">
+      {{else}}
+      <button id="button-passphrase-change" class="btn btn-primary" disabled="true" type="button">
+      {{/if}}
+        <i class="icon-pencil"></i>
+      </button>
+    </div></div>
   </div>
 </template>
 
