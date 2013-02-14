@@ -37,7 +37,7 @@ Template.usercontent.events {
 
 Template.passphrase.events {
   'keyup #passphrase': (ev) ->
-    if not Session.get('set-passphrase')?
+    if not Session.get('passphrase-setting')?
       return null
 
     passphrase = ev.srcElement.value
@@ -57,7 +57,7 @@ Template.passphrase.events {
     null
 
   'click #button-passphrase-set': (ev, tmpl) ->
-    Session.set 'set-passphrase', true
+    Session.set 'passphrase-setting', true
     activateInput(tmpl.find('#passphrase'))
     null
 
@@ -93,17 +93,17 @@ changePassphrase = (newPp) ->
 Template.passphrase.helpers {
   validPassphrase: () ->
     Session.get('pass')?
-  passphraseForm: () ->
-    Session.get('set-passphrase')? or Session.get('passphrase-changing')?
-  setPassphrase: () ->
-    not Session.get('set-passphrase')? and not Session.get('pass')?
+  inputPassphrase: () ->
+    Session.get('passphrase-setting')? or Session.get('passphrase-changing')?
+  btnSetPassphrase: () ->
+    not Session.get('passphrase-setting')? and not Session.get('pass')? and PpHashes.findOne()?
   passphraseError: () ->
     if not Session.get 'pass'
       'error'
     else
       ''
   btnChangePassphrase: () ->
-    Session.get('pass')? and not Session.get('passphrase-changing')?
+    (Session.get('pass')? and not Session.get('passphrase-changing')?) or not PpHashes.findOne()?
   userId: @userId
 }
 
@@ -111,8 +111,8 @@ Template.passphrase.events(okCancelEvents(
   '#passphrase',
   {
     ok: (value, ev) ->
-      if Session.get('set-passphrase')?
-        Session.set 'set-passphrase', null
+      if Session.get('passphrase-setting')?
+        Session.set 'passphrase-setting', null
         if not Session.get 'pass'
           ev.srcElement.value = ''
       else if Session.get('passphrase-changing')?
@@ -121,8 +121,8 @@ Template.passphrase.events(okCancelEvents(
         ev.srcElement.value = Session.get 'pass'
       null
     cancel: (ev) ->
-      if Session.get('set-passphrase')?
-        Session.set 'set-passphrase', null
+      if Session.get('passphrase-setting')?
+        Session.set 'passphrase-setting', null
       else if Session.get('passphrase-changing')?
         Session.set 'passphrase-changing', null
         ev.srcElement.value = Session.get 'pass'

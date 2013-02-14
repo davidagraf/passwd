@@ -50,12 +50,12 @@
 <template name="passphrase">
   <div class="span3 input-append">
     <div class="control-group {{passphraseError}}"><div class="controls">
-      {{#if passphraseForm}}
+      {{#if inputPassphrase}}
         <input type="password" id="passphrase"/>
       {{else}}
         <input type="password" id="passphrase" disabled="true"/>
       {{/if}}
-      {{#if setPassphrase}}
+      {{#if btnSetPassphrase}}
         <button id="button-passphrase-set" class="btn btn-danger" type="button">
       {{else}}
         <button id="button-passphrase-set" class="btn btn-danger" disabled="true" type="button">
