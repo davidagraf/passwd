@@ -13,9 +13,9 @@ Meteor.publish 'pphashes', ()->
   PpHashes.find {'user': @userId}, {}
 
 Meteor.methods {
-  'insertPasswd': (userId, title, username, password) =>
+  'insertPasswd': (title, username, password) ->
     Passwds.insert {
-      'user': userId
+      'user': @userId
       'title': title
       'username': username
       'password': password
@@ -23,9 +23,9 @@ Meteor.methods {
 }
 
 Meteor.methods {
-  insertPpHash: (userId, pphash) ->
+  insertPpHash: (pphash) ->
     PpHashes.update {
-      'user': userId
+      'user': @userId
     },
     {
       '$set': { 'pphash': pphash }
@@ -33,19 +33,19 @@ Meteor.methods {
     {
       'upsert': true
     }
-  deleteEverything: (userId) ->
-    Passwds.remove {'user': userId }
-    PpHashes.remove {'user': userId }
+  deleteEverything: () ->
+    Passwds.remove {'user': @userId }
+    PpHashes.remove {'user': @userId }
 }
 
 Meteor.startup () ->
   Meteor.Router.add
-    '/:user/passwds.csv': (user) ->
+    '/:user/passwds.csv': (userId) ->
       @response.writeHead 200, {
         'Content-Type':'text/csv'
       }
-      entries = Passwds.find {'user': user}, {}
-      @response.write "Ttitle,Username,Encoded Password\n"
-      entries.forEach (entry) ->
+      entries = Passwds.find {'user': userId}, {}
+      @response.write "Title,Username,Encoded Password\n"
+      entries.forEach (entry) =>
         @response.write "#{entry.title},#{entry.username},#{entry.password}\n"
       @response.end()

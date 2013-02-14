@@ -71,8 +71,8 @@ Template.passphrase.events {
     Session.set 'passphrase-changing'
     Session.set 'search'
     Session.set 'passphrase-setting'
-    Meteor.call 'deleteEverything',
-                @userId
+    Session.set 'passwd-undo'
+    Meteor.call 'deleteEverything'
     tmpl.find('#passphrase').value = ''
 }
 
@@ -94,7 +94,6 @@ changePassphrase = (newPp) ->
 
   hash = CryptoJS.SHA3(newPp).toString()
   Meteor.call 'insertPpHash',
-              @userId,
               hash
 
   null
@@ -234,7 +233,6 @@ Template.new.events {
     pass = htmlPass.value
     encrypted = CryptoJS.Rabbit.encrypt(pass, Session.get('pass')).toString()
     Meteor.call 'insertPasswd',
-                @userId,
                 htmlTitle.value,
                 htmlUsername.value,
                 encrypted
