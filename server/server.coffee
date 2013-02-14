@@ -23,7 +23,7 @@ Meteor.methods {
 }
 
 Meteor.methods {
-  'insertPpHash': (userId, pphash) =>
+  insertPpHash: (userId, pphash) ->
     PpHashes.update {
       'user': userId
     },
@@ -33,6 +33,9 @@ Meteor.methods {
     {
       'upsert': true
     }
+  deleteEverything: (userId) ->
+    Passwds.remove {'user': userId }
+    PpHashes.remove {'user': userId }
 }
 
 Meteor.startup () ->
@@ -43,6 +46,6 @@ Meteor.startup () ->
       }
       entries = Passwds.find {'user': user}, {}
       @response.write "Ttitle,Username,Encoded Password\n"
-      entries.forEach (entry) =>
+      entries.forEach (entry) ->
         @response.write "#{entry.title},#{entry.username},#{entry.password}\n"
       @response.end()

@@ -65,6 +65,15 @@ Template.passphrase.events {
     Session.set 'passphrase-changing', true
     activateInput(tmpl.find('#passphrase'))
     null
+
+  'click #button-delete-everything': (ev, tmpl) ->
+    Session.set 'pass'
+    Session.set 'passphrase-changing'
+    Session.set 'search'
+    Session.set 'passphrase-setting'
+    Meteor.call 'deleteEverything',
+                @userId
+    tmpl.find('#passphrase').value = ''
 }
 
 changePassphrase = (newPp) ->
@@ -98,12 +107,12 @@ Template.passphrase.helpers {
   btnSetPassphrase: () ->
     not Session.get('passphrase-setting')? and not Session.get('pass')? and PpHashes.findOne()?
   passphraseError: () ->
-    if not Session.get 'pass'
+    if not Session.get('pass')? and not Session.get('passphrase-changing')?
       'error'
     else
       ''
   btnChangePassphrase: () ->
-    (Session.get('pass')? and not Session.get('passphrase-changing')?) or not PpHashes.findOne()?
+    not Session.get('passphrase-changing')? and (Session.get('pass')? or not PpHashes.findOne()?)
   userId: @userId
 }
 
