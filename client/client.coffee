@@ -212,10 +212,18 @@ Template.passwdlist.events {
 }
 
 Meteor.startup () ->
-#  $('#button-passphrase').tooltip {
-#                                    title: 'replace old pwd with current'
-#                                    placement: 'bottom'
-#                                  }
+  $('#button-passphrase-set').tooltip {
+      title: 'enter passphrase in use'
+      placement: 'bottom'
+    }
+  $('#button-passphrase-change').tooltip {
+      title: 'set / change passphrase'
+      placement: 'bottom'
+    }
+  $('#button-delete-everything').tooltip {
+      title: 'delete all data'
+      placement: 'bottom'
+    }
   null
 
 Template.new.events {
