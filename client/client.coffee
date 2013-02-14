@@ -37,6 +37,9 @@ Template.usercontent.events {
 
 Template.passphrase.events {
   'keyup #passphrase': (ev) ->
+    if not Session.get('set-passphrase')?
+      return null
+
     passphrase = ev.srcElement.value
     storedHash = PpHashes.findOne {}, {}
 
@@ -62,45 +65,45 @@ Template.passphrase.events {
     Session.set 'passphrase-changing', true
     activateInput(tmpl.find('#passphrase'))
     null
-
-#    newPp = $('#passphrase-new').val()
-#    oldPp = Session.get 'pass'
-#    Session.set 'pass', newPp
-#    $('#passphrase').val newPp
-#
-#    # TODO This operation is unsafe. If something crashes, the database
-#    # entries are fucked up. On solution would be versioning: Always keep the
-#    # old encrypted passwords and store the current version in the pphash 
-#    # collection
-#    if oldPp
-#      entries = Passwds.find {}, {}
-#      entries.forEach (entry) ->
-#        oldEncrypted = entry.password
-#        passObj = CryptoJS.Rabbit.decrypt(oldEncrypted, oldPp)
-#        newEncrypted = CryptoJS.Rabbit.encrypt(passObj, Session.get('pass')).toString()
-#        Passwds.update {'_id' : entry._id}, {'$set' : {'password':newEncrypted}}
-#
-#    hash = CryptoJS.SHA3(newPp).toString()
-#    Meteor.call 'insertPpHash',
-#                @userId,
-#                hash
-#
-#
-#    null
 }
+
+changePassphrase = (newPp) ->
+  oldPp = Session.get 'pass'
+  Session.set 'pass', newPp
+
+  # TODO This operation is unsafe. If something crashes, the database
+  # entries are fucked up. On solution would be versioning: Always keep the
+  # old encrypted passwords and store the current version in the pphash 
+  # collection
+  if oldPp
+    entries = Passwds.find {}, {}
+    entries.forEach (entry) ->
+      oldEncrypted = entry.password
+      passObj = CryptoJS.Rabbit.decrypt(oldEncrypted, oldPp)
+      newEncrypted = CryptoJS.Rabbit.encrypt(passObj, Session.get('pass')).toString()
+      Passwds.update {'_id' : entry._id}, {'$set' : {'password':newEncrypted}}
+
+  hash = CryptoJS.SHA3(newPp).toString()
+  Meteor.call 'insertPpHash',
+              @userId,
+              hash
+
+  null
 
 Template.passphrase.helpers {
   validPassphrase: () ->
     Session.get('pass')?
   passphraseForm: () ->
-    Session.get('set-passphrase')?or Session.get('passphrase-changing')?
-  setPassphraseBtn: () ->
-    not Session.get('pass') and not Session.get 'set-passphrase'
+    Session.get('set-passphrase')? or Session.get('passphrase-changing')?
+  setPassphrase: () ->
+    not Session.get('set-passphrase')? and not Session.get('pass')?
   passphraseError: () ->
     if not Session.get 'pass'
       'error'
     else
       ''
+  btnChangePassphrase: () ->
+    Session.get('pass')? and not Session.get('passphrase-changing')?
   userId: @userId
 }
 
@@ -108,13 +111,21 @@ Template.passphrase.events(okCancelEvents(
   '#passphrase',
   {
     ok: (value, ev) ->
-      Session.set 'set-passphrase', null
-      if not Session.get 'pass'
-        ev.srcElement.value = ''
-        null
+      if Session.get('set-passphrase')?
+        Session.set 'set-passphrase', null
+        if not Session.get 'pass'
+          ev.srcElement.value = ''
+      else if Session.get('passphrase-changing')?
+        Session.set 'passphrase-changing', null
+        changePassphrase ev.srcElement.value
+        ev.srcElement.value = Session.get 'pass'
       null
     cancel: (ev) ->
-      Session.set 'set-passphrase', null
+      if Session.get('set-passphrase')?
+        Session.set 'set-passphrase', null
+      else if Session.get('passphrase-changing')?
+        Session.set 'passphrase-changing', null
+        ev.srcElement.value = Session.get 'pass'
       null
   }
 ))
