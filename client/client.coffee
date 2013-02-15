@@ -35,6 +35,9 @@ Template.usercontent.events {
 
 }
 
+deleteCurrentUndo = () ->
+  Session.set 'passwd-undo'
+
 generatePasswdUndo = (obj, isUpdate) ->
   isUpdate = isUpdate or false
   insertObj = {}
@@ -57,7 +60,7 @@ Template.undo.events {
     else
       Meteor.call 'insertPasswdObj',
                   undoObj.insert
-    Session.set 'passwd-undo'
+    deleteCurrentUndo()
 }
 
 Template.undo.helpers {
@@ -109,6 +112,7 @@ Template.passphrase.events {
 changePassphrase = (newPp) ->
   oldPp = Session.get 'pass'
   Session.set 'pass', newPp
+  deleteCurrentUndo()
 
   # TODO This operation is unsafe. If something crashes, the database
   # entries are fucked up. On solution would be versioning: Always keep the
@@ -261,6 +265,7 @@ Meteor.startup () ->
 
 Template.new.events {
   'click #button-new': (ev, tmpl) ->
+    deleteCurrentUndo()
     htmlTitle = tmpl.find('#new-title')
     htmlUsername = tmpl.find('#new-username')
     htmlPass = tmpl.find('#new-password')
