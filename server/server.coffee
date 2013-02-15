@@ -13,16 +13,16 @@ Meteor.publish 'pphashes', ()->
   PpHashes.find {'user': @userId}, {}
 
 Meteor.methods {
-  'insertPasswd': (title, username, password) ->
+  insertPasswd: (title, username, password) ->
     Passwds.insert {
       'user': @userId
       'title': title
       'username': username
       'password': password
     }
-}
-
-Meteor.methods {
+  insertPasswdObj: (obj) ->
+    if obj.user == @userId
+      Passwds.insert obj
   insertPpHash: (pphash) ->
     PpHashes.update {
       'user': @userId

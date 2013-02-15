@@ -35,6 +35,36 @@ Template.usercontent.events {
 
 }
 
+generatePasswdUndo = (obj, isUpdate) ->
+  isUpdate = isUpdate or false
+  insertObj = {}
+  for own key, value of obj
+    if not isUpdate or ( key != '_id' and key != 'user')
+      insertObj[key] = value
+  undoObj = {
+    _id: obj._id
+    insert: insertObj
+    isUpdate: isUpdate
+  }
+  Session.set 'passwd-undo', undoObj
+  null
+
+Template.undo.events {
+  'click #button-undo': () ->
+    undoObj = Session.get 'passwd-undo'
+    if undoObj.isUpdate
+      Passwds.update {'_id' : undoObj._id}, {'$set': undoObj.insert}
+    else
+      Meteor.call 'insertPasswdObj',
+                  undoObj.insert
+    Session.set 'passwd-undo'
+}
+
+Template.undo.helpers {
+  undoSet: () ->
+    Session.get('passwd-undo')?
+}
+
 Template.passphrase.events {
   'keyup #passphrase': (ev) ->
     if not Session.get('passphrase-setting')?
@@ -182,6 +212,7 @@ Template.passwdlist.helpers {
         pass = Session.get 'pass'
         if pass and pass != ''
           encrypted = CryptoJS.Rabbit.encrypt(newval, pass).toString()
+          generatePasswdUndo this, true
           Passwds.update {'_id': @_id}, {'$set': {'password': encrypted}}
       ,
       true
@@ -192,6 +223,7 @@ Template.passwdlist.helpers {
         @title
       ,
       (newval) =>
+        generatePasswdUndo this, true
         Passwds.update {'_id': @_id}, {'$set': {'title': newval}}
         null
 
@@ -200,12 +232,14 @@ Template.passwdlist.helpers {
         @username
       ,
       (newval) =>
+        generatePasswdUndo this, true
         Passwds.update {'_id': @_id}, {'$set': {'username': newval}}
         null
 }
 
 Template.passwdlist.events {
   'click .trash': (ev) ->
+    generatePasswdUndo this
     Passwds.remove {'_id': @_id}
     false
 }

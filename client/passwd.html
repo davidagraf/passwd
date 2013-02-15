@@ -17,6 +17,9 @@
 
 <template name="usercontent">
   <div class="row">
+    {{> undo}}
+  </div>
+  <div class="row">
     <div class="span3">
       <input type="text" id="search" class="search-query" placeholder="search" autocomplete="off" />
     </div>
@@ -44,6 +47,14 @@
         </tbody>
       </table>
     </div>
+  </div>
+</template>
+
+<template name="undo">
+  <div class="offset4 span2">
+    {{#if undoSet}}
+    <button id="button-undo" class="btn btn-link">undo</button>
+    {{/if}}
   </div>
 </template>
 
