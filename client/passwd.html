@@ -62,9 +62,9 @@
   <div class="span3 input-append">
     <div class="control-group {{passphraseError}}"><div class="controls">
       {{#if inputPassphrase}}
-        <input type="password" id="passphrase"/>
+        <input type="password" id="passphrase" placeholder="passphrase"/>
       {{else}}
-        <input type="password" id="passphrase" disabled="true"/>
+        <input type="password" id="passphrase" placeholder="passphrase" disabled="true"/>
       {{/if}}
       {{#if btnSetPassphrase}}
         <button id="button-passphrase-set" class="btn btn-danger" type="button">
@@ -121,12 +121,12 @@
     <td class="cell">
     {{#if editing}}
       <div class="edit">
-        <input class="cell-input" id="cell-input" type="text" value="{{value}}" />
+        <input class="{{passwordClass}} cell-input" id="cell-input" type="text" value="{{value}}" />
       </div>
     {{else}}
       <div class="display">
-        {{#if txtvalue}}
-          {{txtvalue}}
+        {{#if value}}
+        <span class="{{passwordClass}}">{{value}}</span>
         {{/if}}
       </div>
     {{/if}}

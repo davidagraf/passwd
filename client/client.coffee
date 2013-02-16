@@ -176,15 +176,9 @@ Template.passphrase.events(okCancelEvents(
 
 cellMetaData = (valuefunc, updatefunc, ispass) ->
   value = valuefunc()
-  txtvalue =
-    if value and ispass
-      Array(value.length + 1).join '*'
-    else
-      value
   {
-    txtvalue: txtvalue
     value: value
-    ispass: if ispass then ispass else false
+    ispass: ispass || false
     _id: Meteor.uuid()
     updatefunc: updatefunc
   }
@@ -315,8 +309,12 @@ Template.passwdcell.events {
       activateInput(tmpl.find('#cell-input'))
 }
 
-Template.passwdcell.editing = () ->
-  Session.equals 'editing_cell', @_id
+Template.passwdcell.helpers {
+  editing: () ->
+    Session.equals 'editing_cell', @_id
+  passwordClass: () ->
+    if @ispass then 'password' else ''
+}
 
 Template.passwdlist.events(okCancelEvents(
   '#cell-input',
