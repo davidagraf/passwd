@@ -37,15 +37,3 @@ Meteor.methods {
     Passwds.remove {'user': @userId }
     PpHashes.remove {'user': @userId }
 }
-
-Meteor.startup () ->
-  Meteor.Router.add
-    '/:user/passwds.csv': (userId) ->
-      @response.writeHead 200, {
-        'Content-Type':'text/csv'
-      }
-      entries = Passwds.find {'user': userId}, {}
-      @response.write "Title,Username,Encoded Password\n"
-      entries.forEach (entry) =>
-        @response.write "#{entry.title},#{entry.username},#{entry.password}\n"
-      @response.end()

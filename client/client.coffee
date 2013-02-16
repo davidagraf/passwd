@@ -32,7 +32,15 @@ Template.usercontent.events {
   'keyup #search': (ev) ->
     Session.set 'search', ev.srcElement.value
     null
-
+  'click #button-csv': () ->
+    bb = new BlobBuilder()
+    entries = Passwds.find {}, {}
+    bb.append "Title,Username,Password\n"
+    entries.forEach (entry) =>
+      bb.append "#{entry.title},#{entry.username},#{entry.password}\n"
+    blob = bb.getBlob("text/csv;charset=" + document.characterSet)
+    saveAs(blob, "passwd.csv")
+    null
 }
 
 deleteCurrentUndo = () ->
