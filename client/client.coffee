@@ -14,16 +14,16 @@ okCancelEvents = (selector, callbacks) ->
 
   events = {}
   events["keyup #{selector}, keydown #{selector}, focusout #{selector}"] =
-    (ev) ->
+    (ev, tmpl) ->
       if ev.type == 'keydown' and ev.which == 27
         cancel.call this, ev
       else if ev.type == 'keyup' and ev.which == 13 or
               ev.type == 'focusout'
         value = ev.target.value
         if value
-          ok.call this, value, ev
+          ok.call this, value, ev, tmpl
         else
-          cancel.call this, ev
+          cancel.call this, ev, tmpl
       null
   events
 
@@ -263,37 +263,48 @@ Meteor.startup () ->
     }
   null
 
+newPasswdEntry = (tmpl) ->
+  deleteCurrentUndo()
+  htmlTitle = tmpl.find('#new-title')
+  htmlUsername = tmpl.find('#new-username')
+  htmlPass = tmpl.find('#new-password')
+  pass = htmlPass.value
+  encrypted = CryptoJS.Rabbit.encrypt(pass, Session.get('pass')).toString()
+  Meteor.call 'insertPasswd',
+              htmlTitle.value,
+              htmlUsername.value,
+              encrypted
+
+  htmlTitle.value = ''
+  htmlUsername.value = ''
+  htmlPass.value = ''
+  Session.set x for x in ['new-title', 'new-username', 'new-password']
+
+  null
+
 Template.new.events {
   'click #button-new': (ev, tmpl) ->
-    deleteCurrentUndo()
-    htmlTitle = tmpl.find('#new-title')
-    htmlUsername = tmpl.find('#new-username')
-    htmlPass = tmpl.find('#new-password')
-    pass = htmlPass.value
-    encrypted = CryptoJS.Rabbit.encrypt(pass, Session.get('pass')).toString()
-    Meteor.call 'insertPasswd',
-                htmlTitle.value,
-                htmlUsername.value,
-                encrypted
-
-    htmlTitle.value = ''
-    htmlUsername.value = ''
-    htmlPass.value = ''
-
-    null
-  'keyup input' : (ev, tmpl) ->
+    newPasswdEntry tmpl
+  'keyup .input-new' : (ev, tmpl) ->
     id = ev.srcElement.getAttribute('id')
     value = ev.srcElement.value
     if value == ''
       Session.set id
     else
       Session.set id, value
+
+    if ev.type == 'keyup' and ev.which == 13 and allNewInputsSet()
+      newPasswdEntry tmpl
+
     null
 }
 
-Template.new.newEnabled = () ->
+allNewInputsSet = () ->
   Session.get('pass')? and _.all(
     Session.get(x)? for x in ['new-title', 'new-username', 'new-password'])
+
+Template.new.newEnabled = () ->
+  allNewInputsSet()
       
 
 Template.passwdcell.events {
