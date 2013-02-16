@@ -72,8 +72,11 @@ Template.undo.events {
 }
 
 Template.undo.helpers {
-  undoSet: () ->
-    Session.get('passwd-undo')?
+  undoHiddenClass: () ->
+    if Session.get('passwd-undo')?
+      ''
+    else
+      'undo-hidden'
 }
 
 Template.passphrase.events {
