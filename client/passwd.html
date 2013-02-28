@@ -8,6 +8,17 @@
       <div class="span3">
         {{loginButtons align="left"}}
       </div>
+      {{#if currentUser}}
+        <div class="span1 pagination-right">
+          {{> undo}}
+        </div>
+        <div class="span2 pagination-right">
+          {{> globalbtns}}
+        </div>
+        <div class="span5 pagination-right">
+          {{> passphrase}}
+        </div>
+      {{/if}}
     </div>
     {{#if currentUser}}
       {{> usercontent}}
@@ -15,34 +26,32 @@
   </div>
 </body>
 
+<template name="globalbtns">
+  <button id="button-csv" class="btn btn-primary">CSV</button>
+  <button id="button-delete-everything" class="btn" type="button">
+    <i class="icon-trash"></i>
+  </button>
+</template>
+
 <template name="usercontent">
-  <div class="row">
-    {{> undo}}
-  </div>
-  <div class="row">
-    <div class="span3">
-      <input type="text" id="search" class="search-query" placeholder="search" autocomplete="off" />
-    </div>
-    <div class="span3">
-      <!--
-      <a class="btn btn-primary" href="/{{userId}}/passwds.csv">CSV</a>
-      -->
-      <button id="button-csv" class="btn btn-primary">CSV</button>
-    </div>
-    {{> passphrase}}
-  </div>
   <div class="row">
     {{> new}}
   </div>
   <div class="row">
-    <div class="span12">
+    <div class="span3">
+      <input type="text" id="search" class="search-query hundredp" placeholder="search" autocomplete="off" />
+    </div>
+  </div>
+  <div class="row">
+    <div class="span11">
       <table class="table table-striped">
         <thead>
           <tr>
-            <th>Title</th>
-            <th>Username</th>
-            <th>Password</th>
-            <th></th>
+            <th class="span3">Title</th>
+            <th class="span3">Username</th>
+            <th class="span3">Password</th>
+            <th class="span1">Notes</th>
+            <th class="span1"></th>
           </tr>
         </thead>
         <tbody>
@@ -54,19 +63,12 @@
 </template>
 
 <template name="undo">
-  <div class="offset4 span2">
     <button id="button-undo" class="{{undoHiddenClass}} btn btn-link">undo</button>
-  </div>
 </template>
 
 <template name="passphrase">
-  <div class="span3 input-append">
-    <div class="control-group {{passphraseError}}"><div class="controls">
-      {{#if inputPassphrase}}
-        <input type="password" id="passphrase" placeholder="passphrase"/>
-      {{else}}
-        <input type="password" id="passphrase" placeholder="passphrase" disabled="true"/>
-      {{/if}}
+  <div class="input-prepend hundredp">
+    <div class="control-group hundredp {{passphraseError}}"><div class="controls">
       {{#if btnSetPassphrase}}
         <button id="button-passphrase-set" class="btn btn-danger" type="button">
       {{else}}
@@ -81,24 +83,26 @@
       {{/if}}
         <i class="icon-pencil"></i>
       </button>
-      <button id="button-delete-everything" class="btn" type="button">
-        <i class="icon-trash"></i>
-      </button>
+      {{#if inputPassphrase}}
+        <input type="password" id="passphrase" class="span3" placeholder="passphrase"/>
+      {{else}}
+        <input type="password" id="passphrase" class="span3" placeholder="passphrase" disabled="true"/>
+      {{/if}}
     </div></div>
   </div>
 </template>
 
 <template name="new">
   <div class="span3">
-    <input type="text" id="new-title" class="input-new" placeholder="title" />
+    <input type="text" id="new-title" class="input-new hundredp" placeholder="title" />
   </div>
   <div class="span3">
-    <input type="text" id="new-username" class="input-new" placeholder="username" />
+    <input type="text" id="new-username" class="input-new hundredp" placeholder="username" />
   </div>
   <div class="span3">
-    <input type="password" id="new-password" class="input-new" placeholder="password" />
+    <input type="password" id="new-password" class="input-new hundredp" placeholder="password" />
   </div>
-  <div class="span1">
+  <div class="pagination-right offset1 span1">
     {{#if newEnabled}}
     <button class="btn btn-primary" id="button-new">Add</button>
     {{else}}
@@ -113,6 +117,7 @@
     {{> passwdcell passwdcelltitle }}
     {{> passwdcell passwdcellusername }}
     {{> passwdcell passwdcelldecrypt }}
+    <td></td>
     <td><a class="trash" href="#"><i class="icon-trash"> </i></a></td>
   </tr>
 {{/each}}

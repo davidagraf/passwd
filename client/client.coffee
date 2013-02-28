@@ -27,11 +27,7 @@ okCancelEvents = (selector, callbacks) ->
       null
   events
 
-
-Template.usercontent.events {
-  'keyup #search': (ev) ->
-    Session.set 'search', ev.srcElement.value
-    null
+Template.globalbtns.events {
   'click #button-csv': () ->
     bb = new BlobBuilder()
     entries = Passwds.find {}, {}
@@ -40,6 +36,22 @@ Template.usercontent.events {
       bb.append "#{entry.title},#{entry.username},#{entry.password}\n"
     blob = bb.getBlob("text/csv;charset=" + document.characterSet)
     saveAs(blob, "passwd.csv")
+    null
+
+  'click #button-delete-everything': (ev, tmpl) ->
+    Session.set 'pass'
+    Session.set 'passphrase-changing'
+    Session.set 'search'
+    Session.set 'passphrase-setting'
+    Session.set 'passwd-undo'
+    Meteor.call 'deleteEverything'
+    tmpl.find('#passphrase').value = ''
+}
+
+
+Template.usercontent.events {
+  'keyup #search': (ev) ->
+    Session.set 'search', ev.srcElement.value
     null
 }
 
@@ -109,15 +121,6 @@ Template.passphrase.events {
     Session.set 'passphrase-changing', true
     activateInput(tmpl.find('#passphrase'))
     null
-
-  'click #button-delete-everything': (ev, tmpl) ->
-    Session.set 'pass'
-    Session.set 'passphrase-changing'
-    Session.set 'search'
-    Session.set 'passphrase-setting'
-    Session.set 'passwd-undo'
-    Meteor.call 'deleteEverything'
-    tmpl.find('#passphrase').value = ''
 }
 
 changePassphrase = (newPp) ->
@@ -254,6 +257,7 @@ Template.passwdlist.events {
 }
 
 Meteor.startup () ->
+  console.log 'hallo'
   $('#button-passphrase-set').tooltip {
       title: 'enter passphrase in use'
       placement: 'bottom'
