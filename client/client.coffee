@@ -27,6 +27,17 @@ okCancelEvents = (selector, callbacks) ->
       null
   events
 
+Template.globalbtns.rendered = () ->
+  $(@find('#button-delete-everything')).tooltip {
+      title: 'delete all data'
+      placement: 'bottom'
+  }
+  $(@find('#button-csv')).tooltip {
+      title: 'export all data as CSV (encoded)'
+      placement: 'bottom'
+  }
+  null
+
 Template.globalbtns.events {
   'click #button-csv': () ->
     bb = new BlobBuilder()
@@ -90,6 +101,17 @@ Template.undo.helpers {
     else
       'undo-hidden'
 }
+
+Template.passphrase.rendered = () ->
+  $(@find('#button-passphrase-set')).tooltip {
+      title: 'enter passphrase in use'
+      placement: 'bottom'
+  }
+  $(@find('#button-passphrase-change')).tooltip {
+      title: 'set / change passphrase'
+      placement: 'bottom'
+  }
+  null
 
 Template.passphrase.events {
   'keyup #passphrase': (ev) ->
@@ -256,21 +278,21 @@ Template.passwdlist.events {
     false
 }
 
-Meteor.startup () ->
-  console.log 'hallo'
-  $('#button-passphrase-set').tooltip {
-      title: 'enter passphrase in use'
-      placement: 'bottom'
-    }
-  $('#button-passphrase-change').tooltip {
-      title: 'set / change passphrase'
-      placement: 'bottom'
-    }
-  $('#button-delete-everything').tooltip {
-      title: 'delete all data'
-      placement: 'bottom'
-    }
-  null
+#Meteor.startup () ->
+#  console.log 'hallo'
+#  $('#button-passphrase-set').tooltip {
+#      title: 'enter passphrase in use'
+#      placement: 'bottom'
+#    }
+#  $('#button-passphrase-change').tooltip {
+#      title: 'set / change passphrase'
+#      placement: 'bottom'
+#    }
+#  $('#button-delete-everything').tooltip {
+#      title: 'delete all data'
+#      placement: 'bottom'
+#    }
+#  null
 
 newPasswdEntry = (tmpl) ->
   deleteCurrentUndo()
