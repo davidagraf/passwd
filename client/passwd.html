@@ -26,44 +26,15 @@
   </div>
 </body>
 
+<template name="undo">
+    <button id="button-undo" class="{{undoHiddenClass}} btn btn-link">undo</button>
+</template>
+
 <template name="globalbtns">
   <button id="button-csv" class="btn btn-primary">CSV</button>
   <button id="button-delete-everything" class="btn" type="button">
     <i class="icon-trash"></i>
   </button>
-</template>
-
-<template name="usercontent">
-  <div class="row">
-    {{> new}}
-  </div>
-  <div class="row">
-    <div class="span3">
-      <input type="text" id="search" class="search-query hundredp" placeholder="search" autocomplete="off" />
-    </div>
-  </div>
-  <div class="row">
-    <div class="span11">
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th class="span3">Title</th>
-            <th class="span3">Username</th>
-            <th class="span3">Password</th>
-            <th class="span1">Notes</th>
-            <th class="span1"></th>
-          </tr>
-        </thead>
-        <tbody>
-        {{> passwdlist}}
-        </tbody>
-      </table>
-    </div>
-  </div>
-</template>
-
-<template name="undo">
-    <button id="button-undo" class="{{undoHiddenClass}} btn btn-link">undo</button>
 </template>
 
 <template name="passphrase">
@@ -108,6 +79,35 @@
     {{else}}
     <button class="btn btn-primary" id="button-new" disabled="true">Add</button>
     {{/if}}
+  </div>
+</template>
+
+<template name="usercontent">
+  <div class="row">
+    {{> new}}
+  </div>
+  <div class="row">
+    <div class="span3">
+      <input type="text" id="search" class="search-query hundredp" placeholder="search" autocomplete="off" />
+    </div>
+  </div>
+  <div class="row">
+    <div class="span11">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th class="span3">Title</th>
+            <th class="span3">Username</th>
+            <th class="span3">Password</th>
+            <th class="span1">Notes</th>
+            <th class="span1"></th>
+          </tr>
+        </thead>
+        <tbody>
+        {{> passwdlist}}
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 
