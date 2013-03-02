@@ -6,18 +6,24 @@
   },
   "dependencies": {
     "basePackages": {
-      "router": {}
+      "router": {},
+      "font-awesome": {}
     },
     "packages": {
       "router": {
         "git": "https://github.com/tmeasday/meteor-router.git",
-        "tag": "v0.3.5",
-        "commit": "e8e63db2411204f0a6589b74dd591babbfb2da1a"
+        "tag": "v0.4.2",
+        "commit": "82d2895847502b4025370523dba60d597cff4772"
       },
-      "page-js": {
-        "git": "https://github.com/tmeasday/meteor-page-js.git",
+      "font-awesome": {
+        "git": "https://github.com/nate-strauser/meteor-font-awesome.git",
+        "tag": "v0.1.3",
+        "commit": "e507577b97827de662866304f8b9d3d553e3912f"
+      },
+      "page-js-ie-support": {
+        "git": "https://github.com/tmeasday/meteor-page-js-ie-support.git",
         "tag": "v1.3.5",
-        "commit": "c652f795a86498aa4609ab637a694710421cb218"
+        "commit": "b99ed8380aefd10b2afc8f18d9eed4dd0d8ea9cb"
       }
     }
   }
