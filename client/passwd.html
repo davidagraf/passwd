@@ -133,7 +133,9 @@
       {{/if}}
     {{else}}
       {{#if istextarea}}
-      <a href="#" class="link"><i class="icon-edit"></i></a>
+        {{#if validPassphrase}}
+          <a href="#" class="link"><i class="icon-edit"></i></a>
+        {{/if}}
       {{else}}
         {{#if value}}
         <span class="text {{passwordClass}}">{{value}}</span>

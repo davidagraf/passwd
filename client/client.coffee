@@ -14,7 +14,7 @@ activateInput = (input) ->
 
 decrypt = (encrypted) ->
   passphrase = Session.get 'passphrase'
-  if not passphrase
+  if not encrypted or not passphrase
     null
   else
     obj = CryptoJS.Rabbit.decrypt(encrypted, passphrase)
@@ -22,7 +22,7 @@ decrypt = (encrypted) ->
 
 encrypt = (text) ->
   passphrase = Session.get 'passphrase'
-  if not passphrase
+  if not text or not passphrase
     null
   else
     CryptoJS.Rabbit.encrypt(text, passphrase).toString()
@@ -241,7 +241,7 @@ Template.passphrase.events(okCancelEvents(
 cellMetaData = (valuefunc, updatefunc, formtype) ->
   value = valuefunc()
   {
-    value: value
+    value: if not value then '' else value
     formtype: formtype
     _id: Meteor.uuid()
     updatefunc: updatefunc
@@ -288,11 +288,12 @@ Template.passwdlist.helpers {
 
   passwdcellnotes: () ->
     cellMetaData () =>
-        @notes
+        decrypt @notes
       ,
       (newval) =>
+        encrypted = encrypt newval
         generatePasswdUndo this, true
-        Passwds.update {'_id': @_id}, {'$set': {'notes': newval}}
+        Passwds.update {'_id': @_id}, {'$set': {'notes': encrypted}}
         null
       ,
       HTMLFormTypes.textarea
@@ -371,6 +372,8 @@ Template.passwdcell.helpers {
     if @formtype & HTMLFormTypes.password then 'password' else ''
   istextarea: () ->
     @formtype & HTMLFormTypes.textarea
+  validPassphrase: () ->
+    Session.get('passphrase')?
 }
 
 Template.passwdlist.events(okCancelEvents(
