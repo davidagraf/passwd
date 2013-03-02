@@ -96,10 +96,10 @@
       <table class="table table-striped">
         <thead>
           <tr>
-            <th class="span3">Title</th>
-            <th class="span3">Username</th>
-            <th class="span3">Password</th>
-            <th class="span1">Notes</th>
+            <th class="span2">Title</th>
+            <th class="span2">Username</th>
+            <th class="span2">Password</th>
+            <th class="span2">Notes</th>
             <th class="span1"></th>
           </tr>
         </thead>
@@ -117,7 +117,7 @@
     {{> passwdcell passwdcelltitle }}
     {{> passwdcell passwdcellusername }}
     {{> passwdcell passwdcelldecrypt }}
-    <td></td>
+    {{> passwdcell passwdcellnotes }}
     <td><a class="trash" href="#"><i class="icon-trash"> </i></a></td>
   </tr>
 {{/each}}
@@ -126,10 +126,18 @@
 <template name="passwdcell">
     <td class="cell">
     {{#if editing}}
-      <input class="{{passwordClass}} cell-input" id="cell-input" type="text" value="{{value}}" />
+      {{#if istextarea}}
+        <textarea id="cell-input" class="textarea" rows="3">{{value}}</textarea>
+      {{else}}
+        <input class="{{passwordClass}}" id="cell-input" type="text" value="{{value}}" />
+      {{/if}}
     {{else}}
-      {{#if value}}
-      <span class="{{passwordClass}}">{{value}}</span>
+      {{#if istextarea}}
+      <a href="#" class="link"><i class="icon-edit"></i></a>
+      {{else}}
+        {{#if value}}
+        <span class="text {{passwordClass}}">{{value}}</span>
+        {{/if}}
       {{/if}}
     {{/if}}
     </td>

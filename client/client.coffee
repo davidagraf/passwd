@@ -1,9 +1,14 @@
 Meteor.subscribe "passwds"
 Meteor.subscribe "pphashes"
 
+HTMLFormTypes =
+  password : 0x001
+  textarea : 0x010
+
 activateInput = (input) ->
   input.focus()
   input.select()
+  null
 
 # Returns an event map that handles the "escape" and "return" keys and
 # "blur" events on a text input (given by selector) and interprets them as
@@ -15,16 +20,21 @@ okCancelEvents = (selector, callbacks) ->
   events = {}
   events["keyup #{selector}, keydown #{selector}, focusout #{selector}"] =
     (ev, tmpl) ->
+      isTextarea = ev.srcElement.classList.contains 'textarea'
       if ev.type == 'keydown' and ev.which == 27
         cancel.call this, ev
-      else if ev.type == 'keyup' and ev.which == 13 or
-              ev.type == 'focusout'
+        false
+      else if (not isTextarea and
+                ev.type == 'keyup' and ev.which == 13) or
+                ev.type == 'focusout'
         value = ev.target.value
-        if value
+        if isTextarea or value
           ok.call this, value, ev, tmpl
         else
           cancel.call this, ev, tmpl
-      null
+        false
+      else
+        true
   events
 
 Template.globalbtns.rendered = () ->
@@ -210,11 +220,11 @@ Template.passphrase.events(okCancelEvents(
 
 
 
-cellMetaData = (valuefunc, updatefunc, ispass) ->
+cellMetaData = (valuefunc, updatefunc, formtype) ->
   value = valuefunc()
   {
     value: value
-    ispass: ispass || false
+    formtype: formtype
     _id: Meteor.uuid()
     updatefunc: updatefunc
   }
@@ -249,7 +259,7 @@ Template.passwdlist.helpers {
           generatePasswdUndo this, true
           Passwds.update {'_id': @_id}, {'$set': {'password': encrypted}}
       ,
-      true
+      HTMLFormTypes.password
 
 
   passwdcelltitle: () ->
@@ -269,6 +279,18 @@ Template.passwdlist.helpers {
         generatePasswdUndo this, true
         Passwds.update {'_id': @_id}, {'$set': {'username': newval}}
         null
+
+  passwdcellnotes: () ->
+    cellMetaData () =>
+        @notes
+      ,
+      (newval) =>
+        generatePasswdUndo this, true
+        Passwds.update {'_id': @_id}, {'$set': {'notes': newval}}
+        null
+      ,
+      HTMLFormTypes.textarea
+
 }
 
 Template.passwdlist.events {
@@ -339,18 +361,27 @@ Template.new.newEnabled = () ->
       
 
 Template.passwdcell.events {
-  'dblclick .cell' : (ev, tmpl) ->
+  'dblclick .cell .text' : (ev, tmpl) ->
     if @value
       Session.set 'editing_cell', @_id
       Meteor.flush()
       activateInput(tmpl.find('#cell-input'))
+    null
+
+  'click .link' : (ev, tmpl) ->
+    Session.set 'editing_cell', @_id
+    Meteor.flush()
+    activateInput(tmpl.find('#cell-input'))
+    null
 }
 
 Template.passwdcell.helpers {
   editing: () ->
     Session.equals 'editing_cell', @_id
   passwordClass: () ->
-    if @ispass then 'password' else ''
+    if @formtype & HTMLFormTypes.password then 'password' else ''
+  istextarea: () ->
+    @formtype & HTMLFormTypes.textarea
 }
 
 Template.passwdlist.events(okCancelEvents(
