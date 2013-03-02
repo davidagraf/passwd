@@ -6,9 +6,27 @@ HTMLFormTypes =
   textarea : 0x010
 
 activateInput = (input) ->
+  isTextarea = input.classList.contains 'textarea'
   input.focus()
-  input.select()
+  if not isTextarea
+    input.select()
   null
+
+decrypt = (encrypted) ->
+  passphrase = Session.get 'passphrase'
+  if not passphrase
+    null
+  else
+    obj = CryptoJS.Rabbit.decrypt(encrypted, passphrase)
+    obj.toString(CryptoJS.enc.Utf8)
+
+encrypt = (text) ->
+  passphrase = Session.get 'passphrase'
+  if not passphrase
+    null
+  else
+    CryptoJS.Rabbit.encrypt(text, passphrase).toString()
+
 
 # Returns an event map that handles the "escape" and "return" keys and
 # "blur" events on a text input (given by selector) and interprets them as
@@ -60,7 +78,7 @@ Template.globalbtns.events {
     null
 
   'click #button-delete-everything': (ev, tmpl) ->
-    Session.set 'pass'
+    Session.set 'passphrase'
     Session.set 'passphrase-changing'
     Session.set 'search'
     Session.set 'passphrase-setting'
@@ -138,9 +156,9 @@ Template.passphrase.events {
       # TODO: is this secure?
       # if not, the passphrase needs to be stored in a custom reactive data
       # source, # see: http://docs.meteor.com/#meteor_deps
-      Session.set 'pass', ev.srcElement.value
+      Session.set 'passphrase', ev.srcElement.value
     else
-      Session.set 'pass'
+      Session.set 'passphrase'
 
     null
 
@@ -156,8 +174,8 @@ Template.passphrase.events {
 }
 
 changePassphrase = (newPp) ->
-  oldPp = Session.get 'pass'
-  Session.set 'pass', newPp
+  oldPp = Session.get 'passphrase'
+  Session.set 'passphrase', newPp
   deleteCurrentUndo()
 
   # TODO This operation is unsafe. If something crashes, the database
@@ -168,8 +186,8 @@ changePassphrase = (newPp) ->
     entries = Passwds.find {}, {}
     entries.forEach (entry) ->
       oldEncrypted = entry.password
-      passObj = CryptoJS.Rabbit.decrypt(oldEncrypted, oldPp)
-      newEncrypted = CryptoJS.Rabbit.encrypt(passObj, Session.get('pass')).toString()
+      decrypted = decrypt oldEncrypted
+      newEncrypted =  encrypt decrypted
       Passwds.update {'_id' : entry._id}, {'$set' : {'password':newEncrypted}}
 
   hash = CryptoJS.SHA3(newPp).toString()
@@ -180,18 +198,18 @@ changePassphrase = (newPp) ->
 
 Template.passphrase.helpers {
   validPassphrase: () ->
-    Session.get('pass')?
+    Session.get('passphrase')?
   inputPassphrase: () ->
     Session.get('passphrase-setting')? or Session.get('passphrase-changing')?
   btnSetPassphrase: () ->
-    not Session.get('passphrase-setting')? and not Session.get('pass')? and PpHashes.findOne()?
+    not Session.get('passphrase-setting')? and not Session.get('passphrase')? and PpHashes.findOne()?
   passphraseError: () ->
-    if not Session.get('pass')? and not Session.get('passphrase-changing')?
+    if not Session.get('passphrase')? and not Session.get('passphrase-changing')?
       'error'
     else
       ''
   btnChangePassphrase: () ->
-    not Session.get('passphrase-changing')? and (Session.get('pass')? or not PpHashes.findOne()?)
+    not Session.get('passphrase-changing')? and (Session.get('passphrase')? or not PpHashes.findOne()?)
   userId: @userId
 }
 
@@ -201,19 +219,19 @@ Template.passphrase.events(okCancelEvents(
     ok: (value, ev) ->
       if Session.get('passphrase-setting')?
         Session.set 'passphrase-setting', null
-        if not Session.get 'pass'
+        if not Session.get 'passphrase'
           ev.srcElement.value = ''
       else if Session.get('passphrase-changing')?
         Session.set 'passphrase-changing', null
         changePassphrase ev.srcElement.value
-        ev.srcElement.value = Session.get 'pass'
+        ev.srcElement.value = Session.get 'passphrase'
       null
     cancel: (ev) ->
       if Session.get('passphrase-setting')?
         Session.set 'passphrase-setting', null
       else if Session.get('passphrase-changing')?
         Session.set 'passphrase-changing', null
-        ev.srcElement.value = Session.get 'pass'
+        ev.srcElement.value = Session.get 'passphrase'
       null
   }
 ))
@@ -239,28 +257,16 @@ Template.passwdlist.helpers {
     else
       Passwds.find {}, {}
 
-  passwdcelldecrypt: () ->
+  passwdcellpassword: () ->
     cellMetaData () =>
-        pass = Session.get 'pass'
-        text =
-          try
-            if pass and pass != ''
-              obj = CryptoJS.Rabbit.decrypt(@password, Session.get('pass'))
-              obj.toString(CryptoJS.enc.Utf8)
-            else
-              null
-          catch err
-            null
+        decrypt @password
       ,
       (newval) =>
-        pass = Session.get 'pass'
-        if pass and pass != ''
-          encrypted = CryptoJS.Rabbit.encrypt(newval, pass).toString()
-          generatePasswdUndo this, true
-          Passwds.update {'_id': @_id}, {'$set': {'password': encrypted}}
+        encrypted = encrypt newval
+        generatePasswdUndo this, true
+        Passwds.update {'_id': @_id}, {'$set': {'password': encrypted}}
       ,
       HTMLFormTypes.password
-
 
   passwdcelltitle: () ->
     cellMetaData () =>
@@ -300,29 +306,12 @@ Template.passwdlist.events {
     false
 }
 
-#Meteor.startup () ->
-#  console.log 'hallo'
-#  $('#button-passphrase-set').tooltip {
-#      title: 'enter passphrase in use'
-#      placement: 'bottom'
-#    }
-#  $('#button-passphrase-change').tooltip {
-#      title: 'set / change passphrase'
-#      placement: 'bottom'
-#    }
-#  $('#button-delete-everything').tooltip {
-#      title: 'delete all data'
-#      placement: 'bottom'
-#    }
-#  null
-
 newPasswdEntry = (tmpl) ->
   deleteCurrentUndo()
   htmlTitle = tmpl.find('#new-title')
   htmlUsername = tmpl.find('#new-username')
   htmlPass = tmpl.find('#new-password')
-  pass = htmlPass.value
-  encrypted = CryptoJS.Rabbit.encrypt(pass, Session.get('pass')).toString()
+  encrypted = encrypt htmlPass.value
   Meteor.call 'insertPasswd',
               htmlTitle.value,
               htmlUsername.value,
@@ -353,7 +342,7 @@ Template.new.events {
 }
 
 allNewInputsSet = () ->
-  Session.get('pass')? and _.all(
+  Session.get('passphrase')? and _.all(
     Session.get(x)? for x in ['new-title', 'new-username', 'new-password'])
 
 Template.new.newEnabled = () ->
