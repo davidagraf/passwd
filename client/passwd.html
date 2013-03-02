@@ -126,15 +126,11 @@
 <template name="passwdcell">
     <td class="cell">
     {{#if editing}}
-      <div class="span2 edit">
-        <input class="{{passwordClass}} cell-input" id="cell-input" type="text" value="{{value}}" />
-      </div>
+      <input class="{{passwordClass}} cell-input" id="cell-input" type="text" value="{{value}}" />
     {{else}}
-      <div class="span2 display">
-        {{#if value}}
-        <span class="{{passwordClass}}">{{value}}</span>
-        {{/if}}
-      </div>
+      {{#if value}}
+      <span class="{{passwordClass}}">{{value}}</span>
+      {{/if}}
     {{/if}}
     </td>
 </template>
