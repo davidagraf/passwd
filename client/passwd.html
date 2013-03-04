@@ -118,7 +118,7 @@
     {{> passwdcell passwdcellusername }}
     {{> passwdcell passwdcellpassword }}
     {{> passwdcell passwdcellnotes }}
-    <td><a class="trash" href="#"><i class="icon-trash"> </i></a></td>
+    <td><a class="cell-trash" href="#"><i class="icon-trash"> </i></a></td>
   </tr>
 {{/each}}
 </template>
@@ -134,7 +134,7 @@
     {{else}}
       {{#if istextarea}}
         {{#if validPassphrase}}
-          <a href="#" class="link"><i class="icon-edit"></i></a>
+          <a href="#" class="cell-link"><i class="icon-edit"></i></a>
         {{/if}}
       {{else}}
         {{#if value}}

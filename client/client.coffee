@@ -38,7 +38,7 @@ okCancelEvents = (selector, callbacks) ->
   events = {}
   events["keyup #{selector}, keydown #{selector}, focusout #{selector}"] =
     (ev, tmpl) ->
-      isTextarea = ev.srcElement.classList.contains 'textarea'
+      isTextarea = ev.target.classList.contains 'textarea'
       if ev.type == 'keydown' and ev.which == 27
         cancel.call this, ev
         false
@@ -90,7 +90,7 @@ Template.globalbtns.events {
 
 Template.usercontent.events {
   'keyup #search': (ev) ->
-    Session.set 'search', ev.srcElement.value
+    Session.set 'search', ev.target.value
     null
 }
 
@@ -146,7 +146,7 @@ Template.passphrase.events {
     if not Session.get('passphrase-setting')?
       return null
 
-    passphrase = ev.srcElement.value
+    passphrase = ev.target.value
     storedHash = PpHashes.findOne {}, {}
 
     # check if entered passphrase is valid
@@ -156,7 +156,7 @@ Template.passphrase.events {
       # TODO: is this secure?
       # if not, the passphrase needs to be stored in a custom reactive data
       # source, # see: http://docs.meteor.com/#meteor_deps
-      Session.set 'passphrase', ev.srcElement.value
+      Session.set 'passphrase', ev.target.value
     else
       Session.set 'passphrase'
 
@@ -220,18 +220,18 @@ Template.passphrase.events(okCancelEvents(
       if Session.get('passphrase-setting')?
         Session.set 'passphrase-setting', null
         if not Session.get 'passphrase'
-          ev.srcElement.value = ''
+          ev.target.value = ''
       else if Session.get('passphrase-changing')?
         Session.set 'passphrase-changing', null
-        changePassphrase ev.srcElement.value
-        ev.srcElement.value = Session.get 'passphrase'
+        changePassphrase ev.target.value
+        ev.target.value = Session.get 'passphrase'
       null
     cancel: (ev) ->
       if Session.get('passphrase-setting')?
         Session.set 'passphrase-setting', null
       else if Session.get('passphrase-changing')?
         Session.set 'passphrase-changing', null
-        ev.srcElement.value = Session.get 'passphrase'
+        ev.target.value = Session.get 'passphrase'
       null
   }
 ))
@@ -301,7 +301,7 @@ Template.passwdlist.helpers {
 }
 
 Template.passwdlist.events {
-  'click .trash': (ev) ->
+  'click .cell-trash': (ev) ->
     generatePasswdUndo this
     Passwds.remove {'_id': @_id}
     false
@@ -329,8 +329,8 @@ Template.new.events {
   'click #button-new': (ev, tmpl) ->
     newPasswdEntry tmpl
   'keyup .input-new' : (ev, tmpl) ->
-    id = ev.srcElement.getAttribute('id')
-    value = ev.srcElement.value
+    id = ev.target.getAttribute('id')
+    value = ev.target.value
     if value == ''
       Session.set id
     else
@@ -358,7 +358,7 @@ Template.passwdcell.events {
       activateInput(tmpl.find('#cell-input'))
     null
 
-  'click .link' : (ev, tmpl) ->
+  'click .cell-link' : (ev, tmpl) ->
     Session.set 'editing_cell', @_id
     Meteor.flush()
     activateInput(tmpl.find('#cell-input'))
