@@ -139,6 +139,8 @@ Template.passphrase.rendered = () ->
       title: 'set / change passphrase'
       placement: 'bottom'
   }
+  if Session.get 'passphrase-setting' or Session.get 'passphrase-changing'
+    activateInput(this.find('#passphrase'))
   null
 
 Template.passphrase.events {
@@ -164,12 +166,10 @@ Template.passphrase.events {
 
   'click #button-passphrase-set': (ev, tmpl) ->
     Session.set 'passphrase-setting', true
-    activateInput(tmpl.find('#passphrase'))
     null
 
   'click #button-passphrase-change': (ev, tmpl) ->
     Session.set 'passphrase-changing', true
-    activateInput(tmpl.find('#passphrase'))
     null
 }
 
