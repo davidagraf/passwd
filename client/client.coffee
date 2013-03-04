@@ -61,7 +61,7 @@ Template.globalbtns.rendered = () ->
       placement: 'bottom'
   }
   $(@find('#button-csv')).tooltip {
-      title: 'export all data as CSV (encoded)'
+      title: 'export all data as CSV (Rabbit encoded)'
       placement: 'bottom'
   }
   null
