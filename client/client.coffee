@@ -139,7 +139,7 @@ Template.passphrase.rendered = () ->
       title: 'set / change passphrase'
       placement: 'bottom'
   }
-  if Session.get 'passphrase-setting' or Session.get 'passphrase-changing'
+  if Session.get('passphrase-setting') or Session.get('passphrase-changing')
     activateInput(this.find('#passphrase'))
   null
 
