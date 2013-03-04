@@ -143,7 +143,11 @@ Template.passphrase.rendered = () ->
       placement: 'bottom'
   }
   $(@find('#button-passphrase-change')).tooltip {
-      title: 'set / change passphrase'
+      title: 'change passphrase'
+      placement: 'bottom'
+  }
+  $(@find('#passphrase')).tooltip {
+      title: 'enter your passphrase'
       placement: 'bottom'
   }
   if Session.get('passphrase-setting') or Session.get('passphrase-changing')
