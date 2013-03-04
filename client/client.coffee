@@ -1,5 +1,12 @@
 Meteor.subscribe "passwds"
-Meteor.subscribe "pphashes"
+Meteor.subscribe "pphashes", () ->
+  # put cursor into passphrase if necessary
+  if not PpHashes.findOne()?
+    Session.set 'passphrase-changing', true
+  else if not Session.get('passphrase')?
+    Session.set 'passphrase-setting', true
+  null
+
 
 HTMLFormTypes =
   password : 0x001
@@ -202,7 +209,8 @@ Template.passphrase.helpers {
   inputPassphrase: () ->
     Session.get('passphrase-setting')? or Session.get('passphrase-changing')?
   btnSetPassphrase: () ->
-    not Session.get('passphrase-setting')? and not Session.get('passphrase')? and PpHashes.findOne()?
+    not Session.get('passphrase-setting')? and not Session.get('passphrase')? and
+      PpHashes.findOne()?
   passphraseError: () ->
     if not Session.get('passphrase')? and not Session.get('passphrase-changing')?
       'error'
