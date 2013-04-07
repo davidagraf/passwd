@@ -9,12 +9,10 @@ if Meteor.isServer
     PpHashes._ensureIndex {"user" : 1}, {"unique" : false}
 
 Passwds.allow {
-  'remove': (userId, passwds) ->
-    not _.any passwds, (passwd) ->
-      passwd.user != userId
-  'update': (userId, passwds, fields, modifier) ->
-    _.all passwds, (passwd) ->
-      passwd.user == userId
+  'remove': (userId, passwd) ->
+    not passwd.user != userId
+  'update': (userId, passwd, fields, modifier) ->
+    passwd.user == userId
 }
 
 if Meteor.isClient
