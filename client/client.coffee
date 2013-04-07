@@ -77,9 +77,10 @@ Template.globalbtns.events {
   'click #button-csv': () ->
     bb = new BlobBuilder()
     entries = Passwds.find {}, {}
-    bb.append "Title,Username,Password\n"
+    bb.append "Title,Username,Password,Notes\n"
     entries.forEach (entry) =>
-      bb.append "#{entry.title},#{entry.username},#{entry.password}\n"
+      notes = if entry.notes? then entry.notes else ""
+      bb.append "#{entry.title},#{entry.username},#{entry.password},#{notes}\n"
     blob = bb.getBlob("text/csv;charset=" + document.characterSet)
     saveAs(blob, "passwd.csv")
     null
