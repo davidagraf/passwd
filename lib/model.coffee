@@ -16,3 +16,10 @@ Passwds.allow {
     _.all passwds, (passwd) ->
       passwd.user == userId
 }
+
+if Meteor.isClient
+  window.Passwds = Passwds
+  window.PpHashes = PpHashes
+else if Meteor.isServer
+  @Passwds = Passwds
+  @PpHashes = PpHashes

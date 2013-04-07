@@ -1,6 +1,3 @@
-require = __meteor_bootstrap__.require
-Future = require 'fibers/future'
-
 Meteor.startup () ->
   # code to run on server at startup
   # console.log "server startup"
